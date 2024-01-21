@@ -15,24 +15,23 @@ export function isKeyDown(key) {
 }
 
 if ('ontouchstart' in document.documentElement) {
-	document.getElementById('left').addEventListener('touchstart', () => {
-		keysHeld.add('ArrowLeft');
-	});
-	document.getElementById('left').addEventListener('touchend', () => {
-		keysHeld.delete('ArrowLeft');
-	});
-	document.getElementById('right').addEventListener('touchstart', () => {
-		keysHeld.add('ArrowRight');
-	});
-	document.getElementById('right').addEventListener('touchend', () => {
-		keysHeld.delete('ArrowRight');
-	});
-	document.getElementById('jump').addEventListener('touchstart', () => {
-		keysHeld.add(' ');
-	});
-	document.getElementById('jump').addEventListener('touchend', () => {
-		keysHeld.delete(' ');
-	});
+	const touchEvents = {
+		'left': 'ArrowLeft',
+		'right': 'ArrowRight',
+		'jump': ' '
+	};
+
+	for (const [elementId, key] of Object.entries(touchEvents)) {
+		const element = document.getElementById(elementId);
+		element.addEventListener('touchstart', (ev) => {
+			keysHeld.add(key);
+			ev.preventDefault();
+		});
+		element.addEventListener('touchend', (ev) => {
+			keysHeld.delete(key);
+			ev.preventDefault();
+		});
+	}
 } else {
 	document.getElementById('mobile').style.display = 'none';
 }
