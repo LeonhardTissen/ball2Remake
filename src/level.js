@@ -22,13 +22,13 @@ export function loadTestLevel() {
 	for (let i = 0; i < 16; i++) {
 		for (let j = 0; j < 16; j++) {
 			if (i === 0 || i === 15 || j === 0 || j === 15 || (i % 4 === 0 && j % 3 === 0)) {
-				testLevel[i][j] = 21; // Place green bricks on the edges of the level and sporadically throughout
+				testLevel[i][j] = nameToId.greenbricks;
 			} else if (i % 4 === 0 && i !== 2) {
-				testLevel[i][j] = 1; // Place diamonds in a column pattern
+				testLevel[i][j] = nameToId.diamond;
 			} else if (i % 4 === 2 && j % 3 === 0 && i !== 2) {
-				testLevel[i][j] = 3; // Place spikes in a column pattern
+				testLevel[i][j] = nameToId.spike;
 			} else {
-				testLevel[i][j] = 0;
+				testLevel[i][j] = nameToId.air;
 			}
 		}
 	}
