@@ -1,0 +1,16 @@
+body {
+	background-color: #222;
+	color: #fff;
+	font-size: 16px;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+#game {
+	image-rendering: pixelated;
+	background-color: black;
+	width: min(100vw, 100vh);
+	height: min(100vw, 100vh);
+}

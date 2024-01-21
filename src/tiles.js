@@ -1,0 +1,27 @@
+export const tileIds = {
+	0: 'air',
+	1: 'diamond',
+	2: 'goal',
+	3: 'spike',
+	4: 'spring',
+	5: 'launcherright',
+	6: 'launcherleft',
+	7: 'star',
+	8: 'bomb',
+	9: 'spinningplatform',
+	10: 'boosterup',
+	11: 'boosterright',
+	12: 'boosterdown',
+	13: 'boosterleft',
+	14: 'gun',
+	15: 'portalvertical',
+	16: 'portalhorizontal',
+	21: 'greenbricks',
+}
+
+export function isSolid(tileId) {
+	return [
+		'greenbricks',
+
+	].includes(tileIds[tileId]);
+}
