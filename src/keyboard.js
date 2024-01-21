@@ -13,3 +13,28 @@ export function initKeyboard() {
 export function isKeyDown(key) {
 	return keysHeld.has(key);
 }
+
+if ('ontouchstart' in document.documentElement) {
+	document.getElementById('left').addEventListener('touchstart', () => {
+		keysHeld.add('ArrowLeft');
+	});
+	document.getElementById('left').addEventListener('touchend', () => {
+		keysHeld.delete('ArrowLeft');
+	});
+	document.getElementById('right').addEventListener('touchstart', () => {
+		keysHeld.add('ArrowRight');
+	});
+	document.getElementById('right').addEventListener('touchend', () => {
+		keysHeld.delete('ArrowRight');
+	});
+	document.getElementById('jump').addEventListener('touchstart', () => {
+		keysHeld.add(' ');
+	});
+	document.getElementById('jump').addEventListener('touchend', () => {
+		keysHeld.delete(' ');
+	});
+} else {
+	document.getElementById('mobile').style.display = 'none';
+}
+
+document.body.oncontextmenu = () => false;

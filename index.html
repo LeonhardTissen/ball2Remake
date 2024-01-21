@@ -5,9 +5,31 @@
 	<title>Ball 2</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 	<link rel="icon" type="image/png" href="favicon.png" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 </head>
 <body>
 	<canvas id="game" width="160" height="160"></canvas>
+	<div id="mobile">
+		<div id="mobile-left" class="mobile-side">
+			<div id="jump" class="button">
+				<svg viewBox="0 0 10 10">
+					<path d="M 2,2.5 5,8 8,2.5" fill="white" opacity="0.5"/>
+				</svg>
+			</div>
+		</div>
+		<div id="mobile-right" class="mobile-side">
+			<div id="left" class="button">
+				<svg viewBox="0 0 10 10">
+					<path d="M 7.5,2 2,5 7.5,8" fill="white" opacity="0.5"/>
+				</svg>
+			</div>
+			<div id="right" class="button">
+				<svg viewBox="0 0 10 10">
+					<path d="M 2.5,2 8,5 2.5,8" fill="white" opacity="0.5"/>
+				</svg>
+			</div>
+		</div>
+	</div>
 	<script src="src/index.js" type="module"></script>
 </body>
 </html>

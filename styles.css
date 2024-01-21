@@ -1,5 +1,5 @@
 body {
-	background-color: #222;
+	background-color: #090909;
 	color: #fff;
 	font-size: 16px;
 	margin: 0;
@@ -14,4 +14,22 @@ body {
 	background-color: black;
 	width: min(100vw, 100vh);
 	height: min(100vw, 100vh);
+}
+#mobile {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100vw;
+	display: flex;
+	justify-content: space-between;
+}
+.mobile-side {
+	display: flex;
+	flex-direction: row;
+}
+.button {
+	background-color: #0003;
+	border-radius: 50%;
+	width: min(200px, 20vw);
+	margin: 10px
 }
