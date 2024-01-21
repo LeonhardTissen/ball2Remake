@@ -1,4 +1,5 @@
 import { drawSprite } from "./assets.js";
+import { sound } from "./audio.js";
 import { ctx } from "./canvas.js";
 import { isKeyDown } from "./keyboard.js";
 import { addTextEntity } from "./text.js";
@@ -126,6 +127,7 @@ export function tickLevel() {
 						diamondScore = 10;
 					}
 					lastDiamondCollectionTime = now;
+					sound.play('ITM');
 					addTextEntity(playerTileX, playerTileY, diamondScore);
 
 				}

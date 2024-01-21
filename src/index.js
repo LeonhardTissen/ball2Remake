@@ -4,6 +4,7 @@ import "./canvas.js";
 import { initKeyboard } from "./keyboard.js";
 import { loadTestLevel, renderLevel, tickLevel } from "./level.js";
 import { renderTextEntities } from "./text.js";
+import './audio.js';
 
 const ticksPerSecond = 30;
 
