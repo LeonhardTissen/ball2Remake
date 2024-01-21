@@ -104,7 +104,7 @@ export function tickLevel() {
 				} else {
 					// Collision detection for ceiling while jumping
 					if (isSolid(level[Math.floor(entity.x / tileWidth)][Math.floor((entity.y - 4) / tileWidth)])) {
-						entity.y = Math.floor((entity.y) / tileWidth) * tileWidth + 2;
+						entity.y = Math.ceil((entity.y - 4) / tileWidth) * tileWidth + 2;
 						entity.yvel = 0;
 					}
 				}
