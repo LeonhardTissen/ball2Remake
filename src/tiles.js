@@ -19,6 +19,11 @@ export const tileIds = {
 	21: 'greenbricks',
 }
 
+export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
+	acc[name] = parseInt(id);
+	return acc;
+}, {});
+
 export function isSolid(tileId) {
 	return [
 		'greenbricks',
