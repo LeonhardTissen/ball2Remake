@@ -2,44 +2,47 @@ import { drawSprite } from "./assets.js";
 import { sound } from "./audio.js";
 import { ctx } from "./canvas.js";
 import { isKeyDown } from "./keyboard.js";
+import { levels } from "./levels.js";
 import { addTextEntity } from "./text.js";
-import { isSolid, nameToId, tileIds } from "./tiles.js";
-import { create2DArray } from "./utils/array.js";
+import { isEntity, isSolid, nameToId, tileIds } from "./tiles.js";
 
 export let level = null;
 export let entities = [];
 
 const tileWidth = 10;
 let lastDiamondCollectionTime = 0;
+let diamondsLeft = 0;
 let diamondScore = 0;
 const deathTimerLength = 20;
 let deathTimer = 0;
+let currentLevel = 0;
 
-export function loadTestLevel() {
-	const testLevel = create2DArray(16, 16);
+export function loadLevel(levelId) {
+	const testLevel = JSON.parse(JSON.stringify(levels[levelId]));
 	entities = [];
 
-	for (let i = 0; i < 16; i++) {
-		for (let j = 0; j < 16; j++) {
-			if (i === 0 || i === 15 || j === 0 || j === 15 || (i % 4 === 0 && j % 3 === 0)) {
-				testLevel[i][j] = nameToId.greenbricks;
-			} else if (i % 4 === 0 && i !== 2) {
-				testLevel[i][j] = nameToId.diamond;
-			} else if (i % 4 === 2 && j % 3 === 0 && i !== 2) {
-				testLevel[i][j] = nameToId.spike;
-			} else {
-				testLevel[i][j] = nameToId.air;
+	for (let i = 0; i < testLevel.length; i++) {
+		for (let j = 0; j < testLevel[i].length; j++) {
+			switch (testLevel[i][j]) {
+				case nameToId.diamond:
+					diamondsLeft++;
+					break;
+				case nameToId.player:
+					entities.push({
+						type: 'player',
+						x: i * tileWidth + tileWidth / 2,
+						y: j * tileWidth + tileWidth / 2,
+						xvel: 0,
+						yvel: 0,
+					});
+					break;
+			}
+
+			if (isEntity(testLevel[i][j])) {
+				testLevel[i][j] = 0;
 			}
 		}
 	}
-
-	entities.push({
-		type: 'player',
-		x: 25,
-		y: 25,
-		xvel: 0,
-		yvel: 0,
-	});
 
 	level = testLevel;
 }
@@ -49,11 +52,12 @@ export function renderLevel() {
 
 	for (let i = 0; i < 16; i++) {
 		for (let j = 0; j < 16; j++) {
-			if (level[i][j] !== nameToId.air) {
+			if (level[i][j] === nameToId.goal) {
+				drawSprite(diamondsLeft > 0 ? 'goal' : 'goalunlocked', i * tileWidth, j * tileWidth);
+			} else if (level[i][j] !== nameToId.air) {
 				const spriteName = tileIds[level[i][j]];
 				drawSprite(spriteName, i * tileWidth, j * tileWidth);
 			}
-
 		}
 	}
 
@@ -67,7 +71,7 @@ export function renderLevel() {
 						drawSprite(`playerdie${deathAnimFrame}`, entity.x - 5, entity.y - 5);
 					}
 					if (deathTimer <= 0) {
-						loadTestLevel();
+						loadLevel(currentLevel);
 					}
 				} else {
 					drawSprite('player', entity.x - 2, entity.y - 2);
@@ -94,9 +98,13 @@ export function tickLevel() {
 					entity.xvel = 0;
 				}
 				if (isKeyDown('ArrowLeft')) {
-					entity.xvel = -horizontalSpeed;
+					if (entity.xvel > -horizontalSpeed) {
+						entity.xvel = -horizontalSpeed;
+					}
 				} else if (isKeyDown('ArrowRight')) {
-					entity.xvel = horizontalSpeed;
+					if (entity.xvel < horizontalSpeed) {
+						entity.xvel = horizontalSpeed;
+					}
 				}
 
 				// Collision detection for walls
@@ -143,10 +151,30 @@ export function tickLevel() {
 						lastDiamondCollectionTime = now;
 						sound.play('ITM');
 						addTextEntity(playerTileX, playerTileY, diamondScore);
+						diamondsLeft--;
+						console.log(diamondsLeft);
 						break;
 					case nameToId.spike:
 						sound.play('KICK');
 						deathTimer = deathTimerLength;
+						break;
+					case nameToId.launcherright:
+						entity.xvel = 16;
+						entity.yvel = -1;
+						entity.x = playerTileX * tileWidth + tileWidth / 2;
+						entity.y = playerTileY * tileWidth + tileWidth / 2;
+						break;
+					case nameToId.launcherleft:
+						entity.xvel = -16;
+						entity.yvel = -1;
+						entity.x = playerTileX * tileWidth + tileWidth / 2;
+						entity.y = playerTileY * tileWidth + tileWidth / 2;
+						break;
+					case nameToId.goal:
+						if (diamondsLeft === 0) {
+							sound.play('CLIA');
+							deathTimer = deathTimerLength;
+						}
 						break;
 				}
 

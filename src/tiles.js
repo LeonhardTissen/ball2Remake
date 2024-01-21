@@ -17,6 +17,7 @@ export const tileIds = {
 	15: 'portalvertical',
 	16: 'portalhorizontal',
 	21: 'greenbricks',
+	64: 'player',
 }
 
 export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
@@ -27,6 +28,11 @@ export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
 export function isSolid(tileId) {
 	return [
 		'greenbricks',
+	].includes(tileIds[tileId]);
+}
 
+export function isEntity(tileId) {
+	return [
+		'player',
 	].includes(tileIds[tileId]);
 }
