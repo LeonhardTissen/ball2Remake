@@ -162,7 +162,9 @@ export function tickLevel() {
 
 				if (entity.yvel > 0) {
 					// Collision detection for floor while falling
-					if (isSolid(level[Math.floor(entity.x / tileWidth)][Math.floor((entity.y) / tileWidth)])) {
+					const tileX = Math.floor(entity.x / tileWidth);
+					const tileY = Math.floor(entity.y / tileWidth);
+					if (isSolid(level[tileX][tileY], true, tileX, tileY)) {
 						entity.y = Math.floor((entity.y) / tileWidth) * tileWidth - 2;
 	
 						// Lower jump if holding space
@@ -170,18 +172,27 @@ export function tickLevel() {
 					}
 				} else {
 					// Collision detection for ceiling while jumping
-					if (isSolid(level[Math.floor(entity.x / tileWidth)][Math.floor((entity.y - 4) / tileWidth)])) {
+					const tileX = Math.floor(entity.x / tileWidth);
+					const tileY = Math.floor((entity.y - 4) / tileWidth);
+					if (isSolid(level[tileX][tileY], true, tileX, tileY)) {
 						entity.y = Math.ceil((entity.y - 4) / tileWidth) * tileWidth + 2;
 						entity.yvel = 0;
 					}
 				}
 
 				// Collision detection for walls
-				if (entity.xvel > 0 && isSolid(level[Math.floor((entity.x + 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
-					entity.xvel = 0;
-				}
-				if (entity.xvel < 0 && isSolid(level[Math.floor((entity.x - 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
-					entity.xvel = 0;
+				if (entity.xvel > 0) {
+					const tileX = Math.floor((entity.x + 2) / tileWidth);
+					const tileY = Math.floor(entity.y / tileWidth);
+					if (isSolid(level[tileX][tileY], true, tileX, tileY)) {
+						entity.xvel = 0;
+					}
+				} else {
+					const tileX = Math.floor((entity.x - 2) / tileWidth);
+					const tileY = Math.floor(entity.y / tileWidth);
+					if (isSolid(level[tileX][tileY], true, tileX, tileY)) {
+						entity.xvel = 0;
+					}
 				}
 
 				// Collision detection for static tiles

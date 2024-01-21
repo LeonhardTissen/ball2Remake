@@ -1,3 +1,5 @@
+import { level } from "./level.js";
+
 export const tileIds = {
 	0: 'air',
 	1: 'diamond',
@@ -44,7 +46,10 @@ export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
 	return acc;
 }, {});
 
-export function isSolid(tileId) {
+export function isSolid(tileId, playerCaused = false, tileX = null, tileY = null) {
+	if (playerCaused && tileId === nameToId.breakableblock) {
+		level[tileX][tileY] = nameToId.air;
+	}
 	return [
 		'grayblock',
 		'greenbricks',
