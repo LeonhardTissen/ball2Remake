@@ -20,6 +20,7 @@ let currentLevel = 0;
 export function loadLevel(levelId) {
 	const testLevel = JSON.parse(JSON.stringify(levels[levelId]));
 	entities = [];
+	diamondsLeft = 0;
 
 	for (let i = 0; i < testLevel.length; i++) {
 		for (let j = 0; j < testLevel[i].length; j++) {
@@ -149,9 +150,13 @@ export function tickLevel() {
 							diamondScore = 10;
 						}
 						lastDiamondCollectionTime = now;
-						sound.play('ITM');
 						addTextEntity(playerTileX, playerTileY, diamondScore);
 						diamondsLeft--;
+						if (diamondsLeft === 0) {
+							sound.play('CRII');
+						} else {
+							sound.play('ITM');
+						}
 						console.log(diamondsLeft);
 						break;
 					case nameToId.spike:
