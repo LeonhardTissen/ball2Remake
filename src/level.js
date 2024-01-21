@@ -1,6 +1,7 @@
 import { drawSprite } from "./assets.js";
 import { ctx } from "./canvas.js";
 import { isKeyDown } from "./keyboard.js";
+import { addTextEntity } from "./text.js";
 import { isSolid, tileIds } from "./tiles.js";
 import { create2DArray } from "./utils/array.js";
 
@@ -8,6 +9,8 @@ export let level = null;
 export let entities = [];
 
 const tileWidth = 10;
+let lastDiamondCollectionTime = 0;
+let diamondScore = 0;
 
 export function loadTestLevel() {
 	const testLevel = create2DArray(16, 16);
@@ -17,7 +20,7 @@ export function loadTestLevel() {
 		for (let j = 0; j < 16; j++) {
 			if (i === 0 || i === 15 || j === 0 || j === 15 || (i % 4 === 0 && j % 3 === 0)) {
 				testLevel[i][j] = 21; // Place green bricks on the edges of the level and sporadically throughout
-			} else if (i % 4 === 0) {
+			} else if (i % 2 === 0 && i !== 2) {
 				testLevel[i][j] = 1; // Place diamonds in a column pattern
 			} else {
 				testLevel[i][j] = 0;
@@ -110,8 +113,21 @@ export function tickLevel() {
 				}
 
 				// Collision detection for diamonds
-				if (level[Math.floor(entity.x / tileWidth)][Math.floor(entity.y / tileWidth)] === 1) {
-					level[Math.floor(entity.x / tileWidth)][Math.floor(entity.y / tileWidth)] = 0;
+				const playerTileX = Math.floor(entity.x / tileWidth);
+				const playerTileY = Math.floor(entity.y / tileWidth);
+
+				if (level[playerTileX][playerTileY] === 1) {
+					level[playerTileX][playerTileY] = 0;
+
+					const now = performance.now();
+					if (now - lastDiamondCollectionTime < 500) {
+						diamondScore += 10;
+					} else {
+						diamondScore = 10;
+					}
+					lastDiamondCollectionTime = now;
+					addTextEntity(playerTileX, playerTileY, diamondScore);
+
 				}
 
 

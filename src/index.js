@@ -3,6 +3,7 @@ import { loadAssets } from "./assets.js";
 import "./canvas.js";
 import { initKeyboard } from "./keyboard.js";
 import { loadTestLevel, renderLevel, tickLevel } from "./level.js";
+import { renderTextEntities } from "./text.js";
 
 const ticksPerSecond = 30;
 
@@ -16,6 +17,7 @@ loadAssets().then(() => {
 
 function loop() {
 	renderLevel();
+	renderTextEntities();
 
 	requestAnimationFrame(loop);
 }
