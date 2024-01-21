@@ -17,6 +17,9 @@ const deathTimerLength = 20;
 let deathTimer = 0;
 let currentLevel = 0;
 
+const fullJumpVelocity = -5.7;
+const smallJumpVelocity = -2;
+
 export function loadLevel(levelId) {
 	const testLevel = JSON.parse(JSON.stringify(levels[levelId]));
 	entities = [];
@@ -35,6 +38,15 @@ export function loadLevel(levelId) {
 						y: j * tileWidth + tileWidth / 2,
 						xvel: 0,
 						yvel: 0,
+					});
+					break;
+				case nameToId.horizontalmovingplatform1:
+				case nameToId.horizontalmovingplatform2:
+					entities.push({
+						type: tileIds[testLevel[i][j]],
+						x: i * tileWidth + tileWidth / 2,
+						y: j * tileWidth + tileWidth / 2,
+						left: false,
 					});
 					break;
 			}
@@ -78,6 +90,10 @@ export function renderLevel() {
 					drawSprite('player', entity.x - 2, entity.y - 2);
 				}
 				break;
+			case 'horizontalmovingplatform1':
+			case 'horizontalmovingplatform2':
+				drawSprite(entity.type, entity.x - 5, entity.y - 5);
+				break;
 		}
 	}
 }
@@ -109,10 +125,10 @@ export function tickLevel() {
 				}
 
 				// Collision detection for walls
-				if (isSolid(entity.xvel > 0 && level[Math.floor((entity.x + 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
+				if (entity.xvel > 0 && isSolid(level[Math.floor((entity.x + 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
 					entity.xvel = 0;
 				}
-				if (isSolid(entity.xvel < 0 && level[Math.floor((entity.x - 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
+				if (entity.xvel < 0 && isSolid(level[Math.floor((entity.x - 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
 					entity.xvel = 0;
 				}
 
@@ -122,11 +138,7 @@ export function tickLevel() {
 						entity.y = Math.floor((entity.y) / tileWidth) * tileWidth - 2;
 	
 						// Lower jump if holding space
-						if (isKeyDown(' ')) {
-							entity.yvel = -2;
-						} else {
-							entity.yvel = -5.7;
-						}
+						entity.yvel = isKeyDown(' ') ? smallJumpVelocity : fullJumpVelocity;
 					}
 				} else {
 					// Collision detection for ceiling while jumping
@@ -157,7 +169,6 @@ export function tickLevel() {
 						} else {
 							sound.play('ITM');
 						}
-						console.log(diamondsLeft);
 						break;
 					case nameToId.spike:
 						sound.play('KICK');
@@ -183,6 +194,23 @@ export function tickLevel() {
 						break;
 				}
 
+				// Collision with other entities
+				for (const otherEntity of entities) {
+					if (otherEntity.type === 'horizontalmovingplatform1' || otherEntity.type === 'horizontalmovingplatform2') {
+						if (Math.abs(entity.x - otherEntity.x) < 7 && Math.abs(entity.y - otherEntity.y) < 7) {
+							entity.yvel = isKeyDown(' ') ? smallJumpVelocity : fullJumpVelocity;
+						}
+					}
+				}
+
+				break;
+			case 'horizontalmovingplatform1':
+			case 'horizontalmovingplatform2':
+				const speed = entity.type === 'horizontalmovingplatform1' ? 1 : 2;
+				entity.x += entity.left ? -speed : speed;
+				if (isSolid(level[Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
+					entity.left = !entity.left;
+				}
 
 				break;
 		}
