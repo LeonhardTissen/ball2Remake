@@ -1,7 +1,7 @@
  
 # Ball 2 Remake
 
-![favicon.ico](Logo for the game)
+![Logo for the game](favicon.png)
 
 ## How to play
 The remake is accessible here: https://ball2.warze.org/
