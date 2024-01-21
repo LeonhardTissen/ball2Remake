@@ -20,10 +20,27 @@ export function drawDigit(digit, x, y) {
 	drawSprite(spriteName, x, y);
 }
 
-export function drawDigits(digits, x, y, centered = false) {
+const shadowPositions = [
+	[0, 1],
+	[1, 0],
+	[0, -1],
+	[-1, 0],
+	[1, 1],
+	[1, -1],
+	[-1, 1],
+	[-1, -1],
+];
+export function drawDigits(digits, x, y, centered = false, shadow = false) {
 	digits = digits.toString();
 	const offset = centered ? Math.floor(digits.length * -2) : 0;
 	for (let i = 0; i < digits.length; i++) {
+		if (shadow) {
+			ctx.filter = 'brightness(0)';
+			shadowPositions.forEach(([dx, dy]) => {
+				drawDigit(digits[i], x + i * 4 + offset + dx, y + dy);
+			});
+			ctx.filter = 'brightness(1)';
+		}
 		drawDigit(digits[i], x + i * 4 + offset, y);
 	}
 }

@@ -3,8 +3,8 @@ import { sound } from "./audio.js";
 import { ctx } from "./canvas.js";
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
-import { addTextEntity } from "./text.js";
-import { isEntity, isSolid, nameToId, tileIds } from "./tiles.js";
+import { addTextEntity, drawDigits } from "./text.js";
+import { entitySpeed, isEntity, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds } from "./tiles.js";
 
 export let level = null;
 export let entities = [];
@@ -14,8 +14,15 @@ let lastDiamondCollectionTime = 0;
 let diamondsLeft = 0;
 let diamondScore = 0;
 const deathTimerLength = 20;
+const launcherSpeed = 7;
+const launcherStun = 3;
 let deathTimer = 0;
 let currentLevel = 0;
+let tick = 0;
+let stunTimer = 0;
+const boosterVerticalSpeed = 4;
+const boosterHorizontalSpeed = 8;
+let score = 0;
 
 const fullJumpVelocity = -5.7;
 const smallJumpVelocity = -2;
@@ -24,6 +31,7 @@ export function loadLevel(levelId) {
 	const testLevel = JSON.parse(JSON.stringify(levels[levelId]));
 	entities = [];
 	diamondsLeft = 0;
+	score = 0;
 
 	for (let i = 0; i < testLevel.length; i++) {
 		for (let j = 0; j < testLevel[i].length; j++) {
@@ -42,11 +50,22 @@ export function loadLevel(levelId) {
 					break;
 				case nameToId.horizontalmovingplatform1:
 				case nameToId.horizontalmovingplatform2:
+				case nameToId.crab:
+				case nameToId.pinkmonster:
 					entities.push({
 						type: tileIds[testLevel[i][j]],
 						x: i * tileWidth + tileWidth / 2,
 						y: j * tileWidth + tileWidth / 2,
 						left: false,
+					});
+				case nameToId.elevator1:
+				case nameToId.elevator2:
+					entities.push({
+						type: tileIds[testLevel[i][j]],
+						x: i * tileWidth + tileWidth / 2,
+						y: j * tileWidth + tileWidth / 2,
+						down: false,
+						yTransferMomentum: 0,
 					});
 					break;
 			}
@@ -92,44 +111,53 @@ export function renderLevel() {
 				break;
 			case 'horizontalmovingplatform1':
 			case 'horizontalmovingplatform2':
+			case 'elevator1':
+			case 'elevator2':
 				drawSprite(entity.type, entity.x - 5, entity.y - 5);
+				break;
+			case 'crab':
+			case 'pinkmonster':
+				drawSprite(`${entity.type}${Math.floor(tick * 0.5) % 2 + 1}`, entity.x - 5, entity.y - 5);
 				break;
 		}
 	}
+
+	drawDigits(score, 2, 2, false, true);
 }
 
-const horizontalSpeed = 2;
+const horizontalPlayerSpeed = 2;
 
 export function tickLevel() {
+	tick ++;
+
 	for (const entity of entities) {
 		switch (entity.type) {
 			case 'player':
 				if (deathTimer > 0) break;
 				entity.x += entity.xvel;
 				entity.y += entity.yvel;
-				entity.xvel *= 0.6;
+				if (stunTimer > 0) {
+					stunTimer --;
+				} else {
+					entity.xvel *= 0.6;
+				}
 				entity.yvel *= 0.95;
 				entity.yvel += 0.3;
 
 				if (entity.xvel < 0.1 && entity.xvel > -0.1) {
 					entity.xvel = 0;
 				}
-				if (isKeyDown('ArrowLeft')) {
-					if (entity.xvel > -horizontalSpeed) {
-						entity.xvel = -horizontalSpeed;
-					}
-				} else if (isKeyDown('ArrowRight')) {
-					if (entity.xvel < horizontalSpeed) {
-						entity.xvel = horizontalSpeed;
-					}
-				}
 
-				// Collision detection for walls
-				if (entity.xvel > 0 && isSolid(level[Math.floor((entity.x + 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
-					entity.xvel = 0;
-				}
-				if (entity.xvel < 0 && isSolid(level[Math.floor((entity.x - 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
-					entity.xvel = 0;
+				if (stunTimer === 0) {
+					if (isKeyDown('ArrowLeft')) {
+						if (entity.xvel > -horizontalPlayerSpeed) {
+							entity.xvel = -horizontalPlayerSpeed;
+						}
+					} else if (isKeyDown('ArrowRight')) {
+						if (entity.xvel < horizontalPlayerSpeed) {
+							entity.xvel = horizontalPlayerSpeed;
+						}
+					}
 				}
 
 				if (entity.yvel > 0) {
@@ -148,7 +176,15 @@ export function tickLevel() {
 					}
 				}
 
-				// Collision detection for diamonds
+				// Collision detection for walls
+				if (entity.xvel > 0 && isSolid(level[Math.floor((entity.x + 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
+					entity.xvel = 0;
+				}
+				if (entity.xvel < 0 && isSolid(level[Math.floor((entity.x - 2) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
+					entity.xvel = 0;
+				}
+
+				// Collision detection for static tiles
 				const playerTileX = Math.floor(entity.x / tileWidth);
 				const playerTileY = Math.floor(entity.y / tileWidth);
 				switch (level[playerTileX][playerTileY]) {
@@ -163,6 +199,8 @@ export function tickLevel() {
 						}
 						lastDiamondCollectionTime = now;
 						addTextEntity(playerTileX, playerTileY, diamondScore);
+						score += diamondScore;
+
 						diamondsLeft--;
 						if (diamondsLeft === 0) {
 							sound.play('CRII');
@@ -175,16 +213,18 @@ export function tickLevel() {
 						deathTimer = deathTimerLength;
 						break;
 					case nameToId.launcherright:
-						entity.xvel = 16;
+						entity.xvel = launcherSpeed;
 						entity.yvel = -1;
 						entity.x = playerTileX * tileWidth + tileWidth / 2;
 						entity.y = playerTileY * tileWidth + tileWidth / 2;
+						stunTimer = launcherStun;
 						break;
 					case nameToId.launcherleft:
-						entity.xvel = -16;
+						entity.xvel = -launcherSpeed;
 						entity.yvel = -1;
 						entity.x = playerTileX * tileWidth + tileWidth / 2;
 						entity.y = playerTileY * tileWidth + tileWidth / 2;
+						stunTimer = launcherStun;
 						break;
 					case nameToId.goal:
 						if (diamondsLeft === 0) {
@@ -192,13 +232,30 @@ export function tickLevel() {
 							deathTimer = deathTimerLength;
 						}
 						break;
+					case nameToId.boosterup:
+						entity.yvel = -boosterVerticalSpeed;
+						break;
+					case nameToId.boosterright:
+						entity.xvel = boosterHorizontalSpeed;
+						break;
+					case nameToId.boosterdown:
+						entity.yvel = boosterVerticalSpeed;;
+						break;
+					case nameToId.boosterleft:
+						entity.xvel = -boosterHorizontalSpeed;
+						break;
 				}
 
 				// Collision with other entities
 				for (const otherEntity of entities) {
-					if (otherEntity.type === 'horizontalmovingplatform1' || otherEntity.type === 'horizontalmovingplatform2') {
+					if (isEntityPlatform(nameToId[otherEntity.type])) {
 						if (Math.abs(entity.x - otherEntity.x) < 7 && Math.abs(entity.y - otherEntity.y) < 7) {
-							entity.yvel = isKeyDown(' ') ? smallJumpVelocity : fullJumpVelocity;
+							entity.yvel = isKeyDown(' ') ? smallJumpVelocity : fullJumpVelocity + otherEntity.yTransferMomentum || 0;
+						}
+					} else if (isEntityEnemy(nameToId[otherEntity.type])) {
+						if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
+							sound.play('KICK');
+							deathTimer = deathTimerLength;
 						}
 					}
 				}
@@ -206,10 +263,22 @@ export function tickLevel() {
 				break;
 			case 'horizontalmovingplatform1':
 			case 'horizontalmovingplatform2':
-				const speed = entity.type === 'horizontalmovingplatform1' ? 1 : 2;
-				entity.x += entity.left ? -speed : speed;
+			case 'crab':
+			case 'pinkmonster':
+				const horizontalSpeed = entitySpeed[entity.type];
+				entity.x += entity.left ? -horizontalSpeed : horizontalSpeed;
 				if (isSolid(level[Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
 					entity.left = !entity.left;
+				}
+
+				break;
+			case 'elevator1':
+			case 'elevator2':
+				const verticalSpeed = entity.type === 'elevator1' ? 1 : 2;
+				entity.y += entity.down ? -verticalSpeed : verticalSpeed;
+				entity.yTransferMomentum = (entity.down ? -1.5 : 1.5);
+				if (isSolid(level[Math.floor(entity.x / tileWidth)][Math.floor((entity.y + (entity.down ? -5 : 5)) / tileWidth)])) {
+					entity.down = !entity.down;
 				}
 
 				break;
