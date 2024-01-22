@@ -127,8 +127,8 @@ export function renderLevel() {
 
 	if (editorMode && showTileMenu) {
 		Object.keys(tileIds).map(x => parseInt(x)).forEach((tileId, i) => {
-			const x = i % 16;
-			const y = Math.floor(i / 16);
+			const x = i % level.length;
+			const y = Math.floor(i / level[0].length);
 			renderTile(tileId, x, y);
 
 			if (editorCursor.x === x && editorCursor.y === y && buttonsHeld.has(0)) {
@@ -179,8 +179,8 @@ function renderTile(tileId, x, y) {
 }
 
 function renderTiles() {
-	for (let y = 0; y < 16; y++) {
-		for (let x = 0; x < 16; x++) {
+	for (let y = 0; y < level.length; y++) {
+		for (let x = 0; x < level[0].length; x++) {
 			renderTile(level[y][x], x, y)
 		}
 	}
