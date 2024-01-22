@@ -89,7 +89,7 @@ export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
 
 export function isSolid(tileId, playerCaused = false, tileX = null, tileY = null) {
 	if (playerCaused && tileId === nameToId.breakableblock) {
-		level[tileX][tileY] = nameToId.air;
+		level[tileY][tileX] = nameToId.air;
 	}
 	return [
 		'grayblock',
@@ -106,6 +106,33 @@ export function isSolid(tileId, playerCaused = false, tileX = null, tileY = null
 		'leafblock',
 		'bluechainblock',
 		'cakeblock',
+		'wireblock',
+		'pinkblock',
+		'greenchainblock',
+		'blueblock',
+		'yellowchainblock',
+		'pinkchainblock',
+		'yellowbridgeblock',
+		'peablock',
+		'purpleblock',
+		'greenblock',
+		'castleblock',
+		'castlepillar',
+		'statueleft',
+		'statueright',
+		'orangeblock',
+		'limeblock',
+		'redbricks',
+		'redblock',
+		'bubbleblock',
+		'bluebricks',
+		'darkpeablock',
+		'graychainblock',
+		'metalblock',
+		'brownblock',
+		'mushroomblock',
+		'waterblock',
+		'purplechainblock',
 	].includes(tileIds[tileId]);
 }
 

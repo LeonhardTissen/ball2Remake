@@ -1,4 +1,5 @@
 import { cvs } from "./canvas.js";
+import { toggleTileMenu } from "./level.js";
 
 export const editorCursor = {
 	x: 0,
@@ -17,6 +18,11 @@ cvs.addEventListener('mousemove', (e) => {
 
 cvs.addEventListener('mousedown', (e) => {
 	buttonsHeld.add(e.button);
+
+	if (e.button === 1) {
+		toggleTileMenu();
+		e.preventDefault();
+	}
 });
 
 cvs.addEventListener('mouseup', (e) => {

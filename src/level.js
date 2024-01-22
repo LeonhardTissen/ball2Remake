@@ -23,15 +23,22 @@ let stunTimer = 0;
 const boosterVerticalSpeed = 4;
 const boosterHorizontalSpeed = 8;
 let score = 0;
-let editorMode = false;
 let currentLevel = null;
 
 const fullJumpVelocity = -5.7;
 const smallJumpVelocity = -2;
 
+let editorMode = false;
+let showTileMenu = false;
+let currentEditorTile = 1;
+
 export function toggleEditorMode() {
 	editorMode = !editorMode;
 	restartLevel();
+}
+
+export function toggleTileMenu() {
+	showTileMenu = !showTileMenu;
 }
 
 export function restartLevel() {
@@ -100,7 +107,23 @@ export function loadLevel(levelId) {
 export function renderLevel() {
 	ctx.clearRect(0, 0, 160, 160);
 
-	renderTiles();
+	if (editorMode && showTileMenu) {
+		Object.keys(tileIds).map(x => parseInt(x)).forEach((tileId, i) => {
+			const x = i % 16;
+			const y = Math.floor(i / 16);
+			renderTile(tileId, x, y);
+
+			if (editorCursor.x === x && editorCursor.y === y && buttonsHeld.has(0)) {
+				currentEditorTile = tileId;
+				toggleTileMenu();
+				buttonsHeld.delete(0);
+			}
+
+		});
+		
+	} else {
+		renderTiles();
+	}
 
 	if (editorMode) {
 		renderEditor();
@@ -112,8 +135,6 @@ export function renderLevel() {
 
 	drawDigits(score, 2, 2, false, true);
 }
-
-let currentEditorTile = 1;
 
 function renderEditor() {
 	ctx.globalAlpha = Math.sin(tick * 0.25) * 0.3 + 0.7;
@@ -129,29 +150,35 @@ function renderEditor() {
 	}
 }
 
+function renderTile(tileId, x, y) {
+	const spriteName = tileIds[tileId];
+	switch (tileId) {
+		case nameToId.goal:
+			drawSprite(diamondsLeft > 0 ? 'goal' : 'goalunlocked', x * tileWidth, y * tileWidth);
+			break;
+		case nameToId.air:
+			break;
+		case nameToId.crab:
+		case nameToId.pinkmonster:
+		case nameToId.bird:
+		case nameToId.jellyfish:
+		case nameToId.wave:
+		case nameToId.redmonster:
+			drawSprite(`${spriteName}2`, x * tileWidth, y * tileWidth);
+			break;
+		case nameToId.player:
+			drawSprite('player', x * tileWidth + 3, y * tileWidth + 3);
+			break;
+		default:
+			drawSprite(spriteName, x * tileWidth, y * tileWidth);
+			break;
+	}
+}
+
 function renderTiles() {
 	for (let y = 0; y < 16; y++) {
 		for (let x = 0; x < 16; x++) {
-			const spriteName = tileIds[level[y][x]];
-			switch (level[y][x]) {
-				case nameToId.goal:
-					drawSprite(diamondsLeft > 0 ? 'goal' : 'goalunlocked', x * tileWidth, y * tileWidth);
-					break;
-				case nameToId.air:
-					break;
-				case nameToId.crab:
-				case nameToId.pinkmonster:
-				case nameToId.bird:
-				case nameToId.jellyfish:
-					drawSprite(`${spriteName}1`, x * tileWidth, y * tileWidth);
-					break;
-				case nameToId.player:
-					drawSprite('player', x * tileWidth + 3, y * tileWidth + 3);
-					break;
-				default:
-					drawSprite(spriteName, x * tileWidth, y * tileWidth);
-					break;
-			}
+			renderTile(level[y][x], x, y)
 		}
 	}
 }

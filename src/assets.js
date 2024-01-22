@@ -38,15 +38,19 @@ export function drawSprite(spriteName, x, y) {
 	const rx = Math.floor(x);
 	const ry = Math.floor(y);
 
-	ctx.drawImage(
-		img,
-		sprite.x,
-		sprite.y,
-		sprite.w,
-		sprite.h,
-		rx,
-		ry,
-		sprite.w,
-		sprite.h,
-	);
+	try {
+		ctx.drawImage(
+			img,
+			sprite.x,
+			sprite.y,
+			sprite.w,
+			sprite.h,
+			rx,
+			ry,
+			sprite.w,
+			sprite.h,
+		);
+	} catch (e) {
+		console.error(`Could not draw sprite ${spriteName} at ${rx},${ry}`);
+	}
 }

@@ -1,4 +1,4 @@
-import { toggleEditorMode } from "./level.js";
+import { toggleEditorMode, toggleTileMenu } from "./level.js";
 
 export const keysHeld = new Set();
 
@@ -8,6 +8,8 @@ export function initKeyboard() {
 
 		if (e.key === 'e') {
 			toggleEditorMode();
+		} else if (e.key === '1') {
+			toggleTileMenu();
 		}
 	});
 
