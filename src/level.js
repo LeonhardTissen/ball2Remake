@@ -165,7 +165,7 @@ export function loadLevel(levelId) {
 	}
 }
 
-export function renderLevel(context, thumbnail = false) {
+export function renderLevel(context, thumbnail = false, levelRender = level) {
 	if (thumbnail) {
 		ctx.fillStyle = '#000';
 		ctx.fillRect(0, 0, cvs.width, cvs.height);
@@ -175,8 +175,8 @@ export function renderLevel(context, thumbnail = false) {
 
 	if (editorMode && showTileMenu && !thumbnail) {
 		Object.keys(tileIds).map(x => parseInt(x)).forEach((tileId, i) => {
-			const x = i % level.length;
-			const y = Math.floor(i / level[0].length);
+			const x = i % levelRender.length;
+			const y = Math.floor(i / levelRender[0].length);
 			renderTile(tileId, x, y);
 
 			if (editorCursor.x === x && editorCursor.y === y && buttonsHeld.has(0)) {
@@ -187,7 +187,7 @@ export function renderLevel(context, thumbnail = false) {
 
 		});
 	} else {
-		renderTiles(context);
+		renderTiles(context, levelRender);
 	}
 
 	if (thumbnail) return;
@@ -232,7 +232,7 @@ function renderTile(tileId, x, y, context) {
 	}
 }
 
-function renderTiles(context) {
+function renderTiles(context, level) {
 	for (let y = 0; y < level.length; y++) {
 		for (let x = 0; x < level[0].length; x++) {
 			renderTile(level[y][x], x, y, context)
