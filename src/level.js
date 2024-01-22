@@ -1,7 +1,7 @@
 import { drawSprite } from "./assets.js";
 import { sound } from "./audio.js";
 import { ctx, cvs } from "./canvas.js";
-import { editorMode, renderEditor, showTileMenu, toggleTileMenu } from "./editor.js";
+import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, currentEditorTile, setCurrentEditorTile } from "./editor.js";
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
 import { buttonsHeld } from "./mouse.js";
@@ -25,7 +25,7 @@ let stunTimer = 0;
 const boosterVerticalSpeed = 4;
 const boosterHorizontalSpeed = 8;
 let score = 0;
-let currentLevel = null;
+export let currentLevel = null;
 
 let starTimer = 0;
 const starTimerLength = 150;
@@ -132,7 +132,7 @@ export function renderLevel() {
 			renderTile(tileId, x, y);
 
 			if (editorCursor.x === x && editorCursor.y === y && buttonsHeld.has(0)) {
-				currentEditorTile = tileId;
+				setCurrentEditorTile(tileId);
 				toggleTileMenu();
 				buttonsHeld.delete(0);
 			}

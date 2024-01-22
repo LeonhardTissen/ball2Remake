@@ -1,12 +1,13 @@
 import { cvs } from "./canvas.js";
 import { setEditorCursor, toggleTileMenu } from "./editor.js";
+import { level } from "./level.js";
 
 export const buttonsHeld = new Set();
 
 cvs.addEventListener('mousemove', (e) => {
 	const rect = cvs.getBoundingClientRect();
-	const x = Math.floor((e.clientX - rect.left) / rect.width * 16);
-	const y = Math.floor((e.clientY - rect.top) / rect.height * 16);
+	const x = Math.floor((e.clientX - rect.left) / rect.width * level[0].length);
+	const y = Math.floor((e.clientY - rect.top) / rect.height * level.length);
 	setEditorCursor(x, y);
 });
 

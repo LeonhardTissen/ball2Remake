@@ -1,7 +1,8 @@
 import { drawSprite } from "./assets.js";
 import { ctx } from "./canvas.js";
-import { restartLevel } from "./level.js";
+import { currentLevel, restartLevel } from "./level.js";
 import { levels } from "./levels.js";
+import { buttonsHeld } from "./mouse.js";
 import { tick } from "./tick.js";
 import { tileWidth } from "./tilewidth.js";
 
@@ -9,7 +10,7 @@ export let editorMode = false;
 export let showTileMenu = false;
 export let currentEditorTile = 1;
 
-const editorCursor = {
+export const editorCursor = {
 	x: 0,
 	y: 0
 };
@@ -40,4 +41,8 @@ export function renderEditor() {
 export function setEditorCursor(x, y) {
 	editorCursor.x = x;
 	editorCursor.y = y;
+}
+
+export function setCurrentEditorTile(tile) {
+	currentEditorTile = tile;
 }
