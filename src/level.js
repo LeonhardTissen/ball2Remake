@@ -17,11 +17,16 @@ export let entities = [];
 let lastDiamondCollectionTime = 0;
 let diamondsLeft = 0;
 let diamondScore = 0;
-const deathTimerLength = 20;
+
 const launcherSpeed = 7;
 const launcherStun = 3;
-let deathTimer = 0;
 let stunTimer = 0;
+
+let deathTimer = 0;
+const deathTimerLength = 20;
+
+let winTimer = 0;
+const winTimerLength = 30;
 
 const boosterVerticalSpeed = 4;
 const boosterHorizontalSpeed = 8;
@@ -33,9 +38,17 @@ const starTimerLength = 150;
 
 const fullJumpVelocity = -5.7;
 const smallJumpVelocity = -1.9;
+const springVelocity = 8.2;
 
 export function restartLevel() {
 	loadLevel(currentLevel);
+}
+
+export function goToNextLevel() {
+	const levelNum = parseInt(currentLevel.replace('level', ''));
+	const nextLevelNum = levelNum + 1;
+	const nextLevelId = `level${nextLevelNum}`;
+	loadLevel(levels[nextLevelId] ? nextLevelId : '404');
 }
 
 export function loadLevel(levelId) {
@@ -114,6 +127,14 @@ export function loadLevel(levelId) {
 						behaviour: 'neutral',
 					});
 					break;
+				case nameToId.spring:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						springTimer: 0,
+					});
+					break;
 			}
 
 			if (isEntity(testLevel[y][x])) {
@@ -168,6 +189,9 @@ function renderTile(tileId, x, y) {
 		case nameToId.bird:
 		case nameToId.jellyfish:
 		case nameToId.wave:
+		case nameToId.spring:
+			drawSprite(`${spriteName}1`, x * tileWidth, y * tileWidth);
+			break;
 		case nameToId.redmonster:
 			drawSprite(`${spriteName}2`, x * tileWidth, y * tileWidth);
 			break;
@@ -201,6 +225,12 @@ function renderEntities() {
 					if (deathTimer <= 0) {
 						restartLevel();
 					}
+				} else if (winTimer > 0) {
+					winTimer -= 0.2;
+					drawSprite('player', entity.x - 2, entity.y - 2);
+					if (winTimer <= 0) {
+						goToNextLevel();
+					}
 				} else if (starTimer > 10) {
 					drawSprite('playerinvincible', entity.x - 2, entity.y - 2);
 				} else {
@@ -224,6 +254,12 @@ function renderEntities() {
 			case 'redmonster':
 				drawSprite(`${entity.type}${Math.floor(tick * 0.5) % 2 + 1}`, entity.x - 5, entity.y - 5);
 				break;
+			case 'spring':
+				if (entity.springTimer > 0) {
+					entity.springTimer--;
+				}
+				drawSprite(`spring${entity.springTimer > 0 ? 2 : 1}`, entity.x - 5, entity.y - 5);
+				break;
 		}
 	}
 }
@@ -238,7 +274,7 @@ export function tickLevel() {
 	for (const entity of entities) {
 		switch (entity.type) {
 			case 'player':
-				if (deathTimer > 0) break;
+				if (deathTimer > 0 || winTimer > 0) break;
 				entity.x += entity.xvel;
 				entity.y += entity.yvel;
 				if (stunTimer > 0) {
@@ -362,7 +398,7 @@ export function tickLevel() {
 					case nameToId.goal:
 						if (diamondsLeft === 0) {
 							sound.play('CLIA');
-							deathTimer = deathTimerLength;
+							winTimer = winTimerLength;
 						}
 						break;
 					case nameToId.boosterup:
@@ -400,6 +436,11 @@ export function tickLevel() {
 								sound.play('KICK');
 								deathTimer = deathTimerLength;
 							}
+						}
+					} else if (otherEntity.type === 'spring') {
+						if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
+							entity.yvel = -springVelocity;
+							otherEntity.springTimer = 10;
 						}
 					}
 				}

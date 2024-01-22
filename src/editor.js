@@ -44,3 +44,7 @@ export function setEditorCursor(x, y) {
 export function setCurrentEditorTile(tile) {
 	currentEditorTile = tile;
 }
+
+export function exportLevel() {
+	return JSON.stringify(levels[currentLevel]);
+}

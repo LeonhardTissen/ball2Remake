@@ -142,6 +142,7 @@ export function isSolid(tileId, playerCaused = false, tileX = null, tileY = null
 export function isEntity(tileId) {
 	return [
 		'player',
+		'spring',
 		'horizontalmovingplatform1',
 		'horizontalmovingplatform2',
 		'elevator1',
@@ -194,6 +195,7 @@ export function isEntityAnimated(tileId) {
 		'jellyfish',
 		'redmonster',
 		'wave',
+		'spring'
 	].includes(tileIds[tileId]);
 }
 
