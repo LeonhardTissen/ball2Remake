@@ -25,6 +25,10 @@ export function renderExplosionParticles() {
 		const { assetName, x, y, age } = particle;
 		particle.age++;
 
+		// Clear the particle buffer
+		pctx.clearRect(0, 0, tileWidth, tileWidth);
+
+		// Draw the particle to the buffer
 		drawSprite(assetName, 0, 0, pctx);
 
 		const f = Math.round((1 - age / 50) * s); // Final size
