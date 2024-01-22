@@ -1,10 +1,11 @@
 import { drawSprite } from "./assets.js";
 import { sound } from "./audio.js";
 import { ctx, cvs } from "./canvas.js";
-import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, currentEditorTile, setCurrentEditorTile } from "./editor.js";
+import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, setCurrentEditorTile } from "./editor.js";
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
 import { buttonsHeld } from "./mouse.js";
+import { renderExplosionParticles } from "./particle.js";
 import { addTextEntity, drawDigits } from "./text.js";
 import { advanceTick } from "./tick.js";
 import { entitySpeed, isEntity, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds } from "./tiles.js";
@@ -149,6 +150,7 @@ export function renderLevel() {
 	};
 
 	renderEntities();
+	renderExplosionParticles();
 
 	drawDigits(score, 2, 2, false, true);
 }

@@ -33,24 +33,25 @@ function loadImage(url) {
 	});
 }
 
-export function drawSprite(spriteName, x, y) {
+export function drawSprite(spriteName, x, y, context = ctx) {
 	const sprite = json[spriteName];
+
+	if (!sprite) {
+		throw new Error(`No sprite found with name ${spriteName}`);
+	}
+	
 	const rx = Math.floor(x);
 	const ry = Math.floor(y);
 
-	try {
-		ctx.drawImage(
-			img,
-			sprite.x,
-			sprite.y,
-			sprite.w,
-			sprite.h,
-			rx,
-			ry,
-			sprite.w,
-			sprite.h,
-		);
-	} catch (e) {
-		console.error(`Could not draw sprite ${spriteName} at ${rx},${ry}`);
-	}
+	context.drawImage(
+		img,
+		sprite.x,
+		sprite.y,
+		sprite.w,
+		sprite.h,
+		rx,
+		ry,
+		sprite.w,
+		sprite.h,
+	);
 }
