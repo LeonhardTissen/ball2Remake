@@ -5,6 +5,7 @@ import { initKeyboard } from "./keyboard.js";
 import { loadLevel, renderLevel, tickLevel } from "./level.js";
 import { renderTextEntities } from "./text.js";
 import './audio.js';
+import './mouse.js';
 
 const ticksPerSecond = 30;
 

@@ -3,6 +3,7 @@ import { sound } from "./audio.js";
 import { ctx } from "./canvas.js";
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
+import { buttonsHeld, editorCursor } from "./mouse.js";
 import { addTextEntity, drawDigits } from "./text.js";
 import { entitySpeed, isEntity, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds } from "./tiles.js";
 
@@ -99,6 +100,36 @@ export function loadLevel(levelId) {
 export function renderLevel() {
 	ctx.clearRect(0, 0, 160, 160);
 
+	renderTiles();
+
+	if (editorMode) {
+		renderEditor();
+
+		return;
+	};
+
+	renderEntities();
+
+	drawDigits(score, 2, 2, false, true);
+}
+
+let currentEditorTile = 1;
+
+function renderEditor() {
+	ctx.globalAlpha = Math.sin(tick * 0.25) * 0.3 + 0.7;
+	drawSprite('cursor', editorCursor.x * tileWidth, editorCursor.y * tileWidth);
+	ctx.globalAlpha = 1;
+
+	if (buttonsHeld.has(0)) {
+		levels[currentLevel][editorCursor.y][editorCursor.x] = currentEditorTile;
+		restartLevel();
+	} else if (buttonsHeld.has(2)) {
+		levels[currentLevel][editorCursor.y][editorCursor.x] = 0;
+		restartLevel();
+	}
+}
+
+function renderTiles() {
 	for (let y = 0; y < 16; y++) {
 		for (let x = 0; x < 16; x++) {
 			const spriteName = tileIds[level[y][x]];
@@ -123,9 +154,9 @@ export function renderLevel() {
 			}
 		}
 	}
+}
 
-	if (editorMode) return;
-
+function renderEntities() {
 	for (const entity of entities) {
 		switch (entity.type) {
 			case 'player':
@@ -157,8 +188,6 @@ export function renderLevel() {
 				break;
 		}
 	}
-
-	drawDigits(score, 2, 2, false, true);
 }
 
 const horizontalPlayerSpeed = 2;
