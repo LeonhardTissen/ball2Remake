@@ -149,6 +149,11 @@ export function isEntity(tileId) {
 		'jellyfish',
 		'lightning',
 		'wasp',
+		'plane',
+		'plane2',
+		'redmonster',
+		'wave',
+		'crusher',
 	].includes(tileIds[tileId]);
 }
 
@@ -169,6 +174,12 @@ export function isEntityEnemy(tileId) {
 		'jellyfish',
 		'lightning',
 		'wasp',
+		'rollingball',
+		'plane',
+		'plane2',
+		'redmonster',
+		'wave',
+		'crusher',
 	].includes(tileIds[tileId]);
 }
 

@@ -1,6 +1,6 @@
 import { drawSprite } from "./assets.js";
 import { sound } from "./audio.js";
-import { ctx } from "./canvas.js";
+import { ctx, cvs } from "./canvas.js";
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
 import { buttonsHeld, editorCursor } from "./mouse.js";
@@ -62,13 +62,15 @@ export function loadLevel(levelId) {
 
 	for (let y = 0; y < testLevel.length; y++) {
 		for (let x = 0; x < testLevel[y].length; x++) {
-			switch (testLevel[y][x]) {
+			const tileId = testLevel[y][x];
+			const spriteName = tileIds[tileId];
+			switch (tileId) {
 				case nameToId.diamond:
 					diamondsLeft++;
 					break;
 				case nameToId.player:
 					entities.push({
-						type: 'player',
+						type: spriteName,
 						x: x * tileWidth + tileWidth / 2,
 						y: y * tileWidth + tileWidth / 2,
 						xvel: 0,
@@ -80,7 +82,7 @@ export function loadLevel(levelId) {
 				case nameToId.crab:
 				case nameToId.pinkmonster:
 					entities.push({
-						type: tileIds[testLevel[y][x]],
+						type: spriteName,
 						x: x * tileWidth + tileWidth / 2,
 						y: y * tileWidth + tileWidth / 2,
 						left: false,
@@ -88,28 +90,52 @@ export function loadLevel(levelId) {
 					break;
 				case nameToId.elevator1:
 				case nameToId.elevator2:
-				case nameToId.bird:
-				case nameToId.jellyfish:
-				case nameToId.lightning:
 					entities.push({
-						type: tileIds[testLevel[y][x]],
+						type: spriteName,
 						x: x * tileWidth + tileWidth / 2,
 						y: y * tileWidth + tileWidth / 2,
 						down: false,
 						yTransferMomentum: 0,
 					});
 					break;
+				case nameToId.bird:
+				case nameToId.jellyfish:
+				case nameToId.lightning:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						down: false,
+					});
+					break;
+				case nameToId.plane:
+				case nameToId.plane2:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						direction: 'up',
+					});
+					break;
+				case nameToId.crusher:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						behaviour: 'neutral',
+					});
+					break;
 			}
 
 			if (isEntity(testLevel[y][x])) {
-				testLevel[y][x] = 0;
+				testLevel[y][x] = nameToId.air;
 			}
 		}
 	}
 }
 
 export function renderLevel() {
-	ctx.clearRect(0, 0, 160, 160);
+	ctx.clearRect(0, 0, cvs.width, cvs.height);
 
 	if (editorMode && showTileMenu) {
 		Object.keys(tileIds).map(x => parseInt(x)).forEach((tileId, i) => {
@@ -124,7 +150,6 @@ export function renderLevel() {
 			}
 
 		});
-		
 	} else {
 		renderTiles();
 	}
@@ -211,12 +236,16 @@ function renderEntities() {
 			case 'elevator1':
 			case 'elevator2':
 			case 'lightning':
+			case 'crusher':
+			case 'wasp':
 				drawSprite(entity.type, entity.x - 5, entity.y - 5);
 				break;
 			case 'crab':
 			case 'pinkmonster':
 			case 'bird':
 			case 'jellyfish':
+			case 'wave':
+			case 'redmonster':
 				drawSprite(`${entity.type}${Math.floor(tick * 0.5) % 2 + 1}`, entity.x - 5, entity.y - 5);
 				break;
 		}
@@ -416,6 +445,36 @@ export function tickLevel() {
 					entity.down = !entity.down;
 				}
 
+				break;
+			case 'crusher':
+				// Check if player below
+				const playerEntity = entities.find(e => e.type === 'player');
+				if (
+					playerEntity.x > entity.x - 5 &&
+					playerEntity.x < entity.x + 5 &&
+					playerEntity.y > entity.y
+				) {
+					entity.behaviour = 'crushing';
+				}
+
+				switch (entity.behaviour) {
+					case 'crushing':
+						if (isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+							entity.behaviour = 'raising';
+							entity.y = Math.floor((entity.y + 5) / tileWidth) * tileWidth - 5;
+						} else {
+							entity.y += 4;
+						}
+						break;
+					case 'raising':
+						if (isSolid(level[Math.floor((entity.y - 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+							entity.behaviour = 'neutral';
+							entity.y = Math.ceil((entity.y - 5) / tileWidth) * tileWidth + 5;
+						} else {
+							entity.y -= 1;
+						}
+						break;
+				}
 				break;
 		}
 	}
