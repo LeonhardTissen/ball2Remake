@@ -1,5 +1,5 @@
 import { drawSprite } from "./assets.js";
-import { ctx } from "./canvas.js";
+import { ctx, cvs } from "./canvas.js";
 import { currentLevel, restartLevel } from "./level.js";
 import { levels } from "./levels.js";
 import { buttonsHeld } from "./mouse.js";
@@ -34,6 +34,15 @@ export function renderEditor() {
 		levels[currentLevel][editorCursor.y][editorCursor.x] = buttonsHeld.has(0) ? currentEditorTile : nameToId.air;
 		restartLevel();
 	}
+}
+
+export function generateThumbnail() {
+	if (!editorMode) {
+		return;
+	}
+
+	const url = cvs.toDataURL();
+	window.open(url, '_blank');
 }
 
 export function setEditorCursor(x, y) {

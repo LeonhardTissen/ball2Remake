@@ -165,10 +165,15 @@ export function loadLevel(levelId) {
 	}
 }
 
-export function renderLevel() {
-	ctx.clearRect(0, 0, cvs.width, cvs.height);
+export function renderLevel(context, thumbnail = false) {
+	if (thumbnail) {
+		ctx.fillStyle = '#000';
+		ctx.fillRect(0, 0, cvs.width, cvs.height);
+	} else {
+		ctx.clearRect(0, 0, cvs.width, cvs.height);
+	}
 
-	if (editorMode && showTileMenu) {
+	if (editorMode && showTileMenu && !thumbnail) {
 		Object.keys(tileIds).map(x => parseInt(x)).forEach((tileId, i) => {
 			const x = i % level.length;
 			const y = Math.floor(i / level[0].length);
@@ -182,8 +187,10 @@ export function renderLevel() {
 
 		});
 	} else {
-		renderTiles();
+		renderTiles(context);
 	}
+
+	if (thumbnail) return;
 
 	if (editorMode) {
 		renderEditor();
@@ -197,11 +204,11 @@ export function renderLevel() {
 	drawDigits(score, 2, cvs.height - 7, false, true);
 }
 
-function renderTile(tileId, x, y) {
+function renderTile(tileId, x, y, context) {
 	const spriteName = tileIds[tileId];
 	switch (tileId) {
 		case nameToId.goal:
-			drawSprite(diamondsLeft > 0 ? 'goal' : 'goalunlocked', x * tileWidth, y * tileWidth);
+			drawSprite(diamondsLeft > 0 ? 'goal' : 'goalunlocked', x * tileWidth, y * tileWidth, context);
 			break;
 		case nameToId.air:
 			break;
@@ -211,24 +218,24 @@ function renderTile(tileId, x, y) {
 		case nameToId.jellyfish:
 		case nameToId.wave:
 		case nameToId.spring:
-			drawSprite(`${spriteName}1`, x * tileWidth, y * tileWidth);
+			drawSprite(`${spriteName}1`, x * tileWidth, y * tileWidth, context);
 			break;
 		case nameToId.redmonster:
-			drawSprite(`${spriteName}2`, x * tileWidth, y * tileWidth);
+			drawSprite(`${spriteName}2`, x * tileWidth, y * tileWidth, context);
 			break;
 		case nameToId.player:
-			drawSprite('player', x * tileWidth + 3, y * tileWidth + 3);
+			drawSprite('player', x * tileWidth + 3, y * tileWidth + 3, context);
 			break;
 		default:
-			drawSprite(spriteName, x * tileWidth, y * tileWidth);
+			drawSprite(spriteName, x * tileWidth, y * tileWidth, context);
 			break;
 	}
 }
 
-function renderTiles() {
+function renderTiles(context) {
 	for (let y = 0; y < level.length; y++) {
 		for (let x = 0; x < level[0].length; x++) {
-			renderTile(level[y][x], x, y)
+			renderTile(level[y][x], x, y, context)
 		}
 	}
 }

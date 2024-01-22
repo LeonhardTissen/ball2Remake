@@ -6,6 +6,7 @@ import { loadLevel, renderLevel, tickLevel } from "./level.js";
 import { renderTextEntities } from "./text.js";
 import './audio.js';
 import './mouse.js';
+import { ctx } from "./canvas.js";
 
 const ticksPerSecond = 30;
 
@@ -18,7 +19,7 @@ loadAssets().then(() => {
 
 
 function loop() {
-	renderLevel();
+	renderLevel(ctx);
 	renderTextEntities();
 
 	requestAnimationFrame(loop);
