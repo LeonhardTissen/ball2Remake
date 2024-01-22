@@ -1,5 +1,5 @@
 import { exportLevel, toggleEditorMode, toggleTileMenu } from "./editor.js";
-import { goToNextLevel } from "./level.js";
+import { goToFirstLevel, goToNextLevel } from "./level.js";
 
 export const keysHeld = new Set();
 
@@ -16,6 +16,8 @@ export function initKeyboard() {
 			console.log(exportedLevel);
 		} else if (e.key === 'm') {
 			goToNextLevel();
+		} else if (e.key === 'n') {
+			goToFirstLevel();
 		}
 	});
 

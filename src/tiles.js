@@ -1,3 +1,4 @@
+import { sound } from "./audio.js";
 import { level } from "./level.js";
 import { createExplosionParticles } from "./particle.js";
 import { tileWidth } from "./tilewidth.js";
@@ -93,6 +94,7 @@ export function isSolid(tileId, playerCaused = false, tileX = null, tileY = null
 	if (playerCaused && tileId === nameToId.breakableblock) {
 		level[tileY][tileX] = nameToId.air;
 		createExplosionParticles('breakableblock', tileX * tileWidth, tileY * tileWidth);
+		sound.play('TI');
 	}
 	return [
 		'grayblock',

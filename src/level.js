@@ -51,6 +51,10 @@ export function goToNextLevel() {
 	loadLevel(levels[nextLevelId] ? nextLevelId : '404');
 }
 
+export function goToFirstLevel() {
+	loadLevel('level1');
+}
+
 export function loadLevel(levelId) {
 	currentLevel = levelId;
 	const testLevel = JSON.parse(JSON.stringify(levels[levelId]));

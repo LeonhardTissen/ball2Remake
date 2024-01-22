@@ -58,4 +58,4 @@ export const sound = new Howl({
     sprite: audioData.sprite,
     autoplay: true
 });
-sound.volume(0.02);
+sound.volume(0.1);
