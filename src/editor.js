@@ -4,6 +4,7 @@ import { currentLevel, restartLevel } from "./level.js";
 import { levels } from "./levels.js";
 import { buttonsHeld } from "./mouse.js";
 import { tick } from "./tick.js";
+import { nameToId } from "./tiles.js";
 import { tileWidth } from "./tilewidth.js";
 
 export let editorMode = false;
@@ -29,11 +30,8 @@ export function renderEditor() {
 	drawSprite('cursor', editorCursor.x * tileWidth, editorCursor.y * tileWidth);
 	ctx.globalAlpha = 1;
 
-	if (buttonsHeld.has(0)) {
-		levels[currentLevel][editorCursor.y][editorCursor.x] = currentEditorTile;
-		restartLevel();
-	} else if (buttonsHeld.has(2)) {
-		levels[currentLevel][editorCursor.y][editorCursor.x] = 0;
+	if (buttonsHeld.has(0) || buttonsHeld.has(2)) {
+		levels[currentLevel][editorCursor.y][editorCursor.x] = buttonsHeld.has(0) ? currentEditorTile : nameToId.air;
 		restartLevel();
 	}
 }
