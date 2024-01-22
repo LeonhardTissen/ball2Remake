@@ -139,6 +139,23 @@ export function loadLevel(levelId) {
 						springTimer: 0,
 					});
 					break;
+				case nameToId.wave:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						left: false,
+						originY: y * tileWidth + tileWidth / 2,
+					});
+					break;
+				case nameToId.rollingball:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						left: false,
+					});
+					break;
 			}
 
 			if (isEntity(testLevel[y][x])) {
@@ -177,7 +194,7 @@ export function renderLevel() {
 	renderEntities();
 	renderExplosionParticles();
 
-	drawDigits(score, 2, 2, false, true);
+	drawDigits(score, 2, cvs.height - 7, false, true);
 }
 
 function renderTile(tileId, x, y) {
@@ -248,6 +265,7 @@ function renderEntities() {
 			case 'lightning':
 			case 'crusher':
 			case 'wasp':
+			case 'rollingball':
 				drawSprite(entity.type, entity.x - 5, entity.y - 5);
 				break;
 			case 'crab':
@@ -460,6 +478,29 @@ export function tickLevel() {
 					entity.left = !entity.left;
 				}
 
+				break;
+			case 'wave':
+				entity.x += entity.left ? -3 : 3;
+				entity.y = entity.originY + Math.sin(tick * 0.3) * tileWidth;
+				if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth)])) {
+					entity.left = !entity.left;
+				}
+				break;
+			case 'rollingball':
+				// Check if ball can fall
+				if (
+					!isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor((entity.x + 4) / tileWidth)]) &&
+					!isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor((entity.x - 4) / tileWidth)])
+				) {
+					entity.y += 2;
+				} else {
+					entity.y = Math.floor((entity.y + 5) / tileWidth) * tileWidth - 5;
+					
+					entity.x += entity.left ? -2 : 2;
+					if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth)])) {
+						entity.left = !entity.left;
+					}
+				}
 				break;
 			case 'elevator1':
 			case 'elevator2':
