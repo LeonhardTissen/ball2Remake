@@ -20,10 +20,14 @@ const launcherStun = 3;
 let deathTimer = 0;
 let tick = 0;
 let stunTimer = 0;
+
 const boosterVerticalSpeed = 4;
 const boosterHorizontalSpeed = 8;
 let score = 0;
 let currentLevel = null;
+
+let starTimer = 0;
+const starTimerLength = 150;
 
 const fullJumpVelocity = -5.7;
 const smallJumpVelocity = -2;
@@ -196,6 +200,8 @@ function renderEntities() {
 					if (deathTimer <= 0) {
 						restartLevel();
 					}
+				} else if (starTimer > 10) {
+					drawSprite('playerinvincible', entity.x - 2, entity.y - 2);
 				} else {
 					drawSprite('player', entity.x - 2, entity.y - 2);
 				}
@@ -252,6 +258,10 @@ export function tickLevel() {
 							entity.xvel = horizontalPlayerSpeed;
 						}
 					}
+				}
+
+				if (starTimer > 0) {
+					starTimer --;
 				}
 
 				if (entity.yvel > 0) {
@@ -313,9 +323,19 @@ export function tickLevel() {
 							sound.play('ITM');
 						}
 						break;
+					case nameToId.star:
+						sound.play('CRII');
+						starTimer = starTimerLength;
+						level[playerTileY][playerTileX] = nameToId.air;
+						break;
 					case nameToId.spike:
-						sound.play('KICK');
-						deathTimer = deathTimerLength;
+						if (starTimer > 0) {
+							sound.play('DIE');
+							level[playerTileY][playerTileX] = nameToId.air;
+						} else {
+							sound.play('KICK');
+							deathTimer = deathTimerLength;
+						}
 						break;
 					case nameToId.launcherright:
 						entity.xvel = launcherSpeed;
@@ -358,9 +378,16 @@ export function tickLevel() {
 							entity.yvel = isKeyDown(' ') ? smallJumpVelocity : fullJumpVelocity + (otherEntity.yTransferMomentum || 0);
 						}
 					} else if (isEntityEnemy(nameToId[otherEntity.type])) {
-						if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
-							sound.play('KICK');
-							deathTimer = deathTimerLength;
+						if (starTimer > 0) {
+							if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
+								sound.play('DIE');
+								entities.splice(entities.indexOf(otherEntity), 1);
+							}
+						} else {
+							if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
+								sound.play('KICK');
+								deathTimer = deathTimerLength;
+							}
 						}
 					}
 				}
