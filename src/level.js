@@ -1,16 +1,18 @@
 import { drawSprite } from "./assets.js";
 import { sound } from "./audio.js";
 import { ctx, cvs } from "./canvas.js";
+import { editorMode, renderEditor, showTileMenu, toggleTileMenu } from "./editor.js";
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
-import { buttonsHeld, editorCursor } from "./mouse.js";
+import { buttonsHeld } from "./mouse.js";
 import { addTextEntity, drawDigits } from "./text.js";
+import { advanceTick } from "./tick.js";
 import { entitySpeed, isEntity, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds } from "./tiles.js";
+import { tileWidth } from "./tilewidth.js";
 
 export let level = null;
 export let entities = [];
 
-const tileWidth = 10;
 let lastDiamondCollectionTime = 0;
 let diamondsLeft = 0;
 let diamondScore = 0;
@@ -18,7 +20,6 @@ const deathTimerLength = 20;
 const launcherSpeed = 7;
 const launcherStun = 3;
 let deathTimer = 0;
-let tick = 0;
 let stunTimer = 0;
 
 const boosterVerticalSpeed = 4;
@@ -31,19 +32,6 @@ const starTimerLength = 150;
 
 const fullJumpVelocity = -5.7;
 const smallJumpVelocity = -2;
-
-let editorMode = false;
-let showTileMenu = false;
-let currentEditorTile = 1;
-
-export function toggleEditorMode() {
-	editorMode = !editorMode;
-	restartLevel();
-}
-
-export function toggleTileMenu() {
-	showTileMenu = !showTileMenu;
-}
 
 export function restartLevel() {
 	loadLevel(currentLevel);
@@ -165,20 +153,6 @@ export function renderLevel() {
 	drawDigits(score, 2, 2, false, true);
 }
 
-function renderEditor() {
-	ctx.globalAlpha = Math.sin(tick * 0.25) * 0.3 + 0.7;
-	drawSprite('cursor', editorCursor.x * tileWidth, editorCursor.y * tileWidth);
-	ctx.globalAlpha = 1;
-
-	if (buttonsHeld.has(0)) {
-		levels[currentLevel][editorCursor.y][editorCursor.x] = currentEditorTile;
-		restartLevel();
-	} else if (buttonsHeld.has(2)) {
-		levels[currentLevel][editorCursor.y][editorCursor.x] = 0;
-		restartLevel();
-	}
-}
-
 function renderTile(tileId, x, y) {
 	const spriteName = tileIds[tileId];
 	switch (tileId) {
@@ -255,7 +229,7 @@ function renderEntities() {
 const horizontalPlayerSpeed = 2;
 
 export function tickLevel() {
-	tick ++;
+	advanceTick();
 
 	if (editorMode) return;
 

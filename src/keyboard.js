@@ -1,4 +1,4 @@
-import { toggleEditorMode, toggleTileMenu } from "./level.js";
+import { toggleEditorMode, toggleTileMenu } from "./editor.js";
 
 export const keysHeld = new Set();
 
