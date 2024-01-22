@@ -5,6 +5,9 @@ import { level } from "./level.js";
 export const buttonsHeld = new Set();
 
 cvs.addEventListener('mousemove', (e) => {
+	if (level === null) {
+		return;
+	}
 	const rect = cvs.getBoundingClientRect();
 	const x = Math.floor((e.clientX - rect.left) / rect.width * level[0].length);
 	const y = Math.floor((e.clientY - rect.top) / rect.height * level.length);

@@ -186,6 +186,17 @@ export function isEntityEnemy(tileId) {
 	].includes(tileIds[tileId]);
 }
 
+export function isEntityAnimated(tileId) {
+	return [
+		'crab',
+		'pinkmonster',
+		'bird',
+		'jellyfish',
+		'redmonster',
+		'wave',
+	].includes(tileIds[tileId]);
+}
+
 export const entitySpeed = {
 	horizontalmovingplatform1: 1,
 	horizontalmovingplatform2: 2,

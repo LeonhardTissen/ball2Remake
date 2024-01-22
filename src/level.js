@@ -5,10 +5,10 @@ import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, s
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
 import { buttonsHeld } from "./mouse.js";
-import { renderExplosionParticles } from "./particle.js";
+import { createExplosionParticles, renderExplosionParticles } from "./particle.js";
 import { addTextEntity, drawDigits } from "./text.js";
-import { advanceTick } from "./tick.js";
-import { entitySpeed, isEntity, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds } from "./tiles.js";
+import { advanceTick, tick } from "./tick.js";
+import { entitySpeed, isEntity, isEntityAnimated, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds } from "./tiles.js";
 import { tileWidth } from "./tilewidth.js";
 
 export let level = null;
@@ -32,7 +32,7 @@ let starTimer = 0;
 const starTimerLength = 150;
 
 const fullJumpVelocity = -5.7;
-const smallJumpVelocity = -2;
+const smallJumpVelocity = -1.9;
 
 export function restartLevel() {
 	loadLevel(currentLevel);
@@ -335,9 +335,12 @@ export function tickLevel() {
 						break;
 					case nameToId.spike:
 						if (starTimer > 0) {
+							// Destroy spike
 							sound.play('DIE');
 							level[playerTileY][playerTileX] = nameToId.air;
+							createExplosionParticles('spike', playerTileX * tileWidth, playerTileY * tileWidth);
 						} else {
+							// Kill player
 							sound.play('KICK');
 							deathTimer = deathTimerLength;
 						}
@@ -384,11 +387,15 @@ export function tickLevel() {
 						}
 					} else if (isEntityEnemy(nameToId[otherEntity.type])) {
 						if (starTimer > 0) {
+							// Kill enemy
 							if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
 								sound.play('DIE');
 								entities.splice(entities.indexOf(otherEntity), 1);
+								const explosionSprite = isEntityAnimated(nameToId[otherEntity.type]) ? `${otherEntity.type}1` : otherEntity.type;
+								createExplosionParticles(explosionSprite, otherEntity.x - 5, otherEntity.y - 5);
 							}
 						} else {
+							// Kill player
 							if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
 								sound.play('KICK');
 								deathTimer = deathTimerLength;
