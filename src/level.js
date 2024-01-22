@@ -17,18 +17,28 @@ const deathTimerLength = 20;
 const launcherSpeed = 7;
 const launcherStun = 3;
 let deathTimer = 0;
-let currentLevel = 0;
 let tick = 0;
 let stunTimer = 0;
 const boosterVerticalSpeed = 4;
 const boosterHorizontalSpeed = 8;
 let score = 0;
 let editorMode = false;
+let currentLevel = null;
 
 const fullJumpVelocity = -5.7;
 const smallJumpVelocity = -2;
 
+export function toggleEditorMode() {
+	editorMode = !editorMode;
+	restartLevel();
+}
+
+export function restartLevel() {
+	loadLevel(currentLevel);
+}
+
 export function loadLevel(levelId) {
+	currentLevel = levelId;
 	const testLevel = JSON.parse(JSON.stringify(levels[levelId]));
 	level = testLevel;
 
@@ -38,17 +48,17 @@ export function loadLevel(levelId) {
 	diamondsLeft = 0;
 	score = 0;
 
-	for (let i = 0; i < testLevel.length; i++) {
-		for (let j = 0; j < testLevel[i].length; j++) {
-			switch (testLevel[i][j]) {
+	for (let y = 0; y < testLevel.length; y++) {
+		for (let x = 0; x < testLevel[y].length; x++) {
+			switch (testLevel[y][x]) {
 				case nameToId.diamond:
 					diamondsLeft++;
 					break;
 				case nameToId.player:
 					entities.push({
 						type: 'player',
-						x: i * tileWidth + tileWidth / 2,
-						y: j * tileWidth + tileWidth / 2,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
 						xvel: 0,
 						yvel: 0,
 					});
@@ -58,9 +68,9 @@ export function loadLevel(levelId) {
 				case nameToId.crab:
 				case nameToId.pinkmonster:
 					entities.push({
-						type: tileIds[testLevel[i][j]],
-						x: i * tileWidth + tileWidth / 2,
-						y: j * tileWidth + tileWidth / 2,
+						type: tileIds[testLevel[y][x]],
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
 						left: false,
 					});
 					break;
@@ -70,17 +80,17 @@ export function loadLevel(levelId) {
 				case nameToId.jellyfish:
 				case nameToId.lightning:
 					entities.push({
-						type: tileIds[testLevel[i][j]],
-						x: i * tileWidth + tileWidth / 2,
-						y: j * tileWidth + tileWidth / 2,
+						type: tileIds[testLevel[y][x]],
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
 						down: false,
 						yTransferMomentum: 0,
 					});
 					break;
 			}
 
-			if (isEntity(testLevel[i][j])) {
-				testLevel[i][j] = 0;
+			if (isEntity(testLevel[y][x])) {
+				testLevel[y][x] = 0;
 			}
 		}
 	}
@@ -89,12 +99,12 @@ export function loadLevel(levelId) {
 export function renderLevel() {
 	ctx.clearRect(0, 0, 160, 160);
 
-	for (let i = 0; i < 16; i++) {
-		for (let j = 0; j < 16; j++) {
-			const spriteName = tileIds[level[i][j]];
-			switch (level[i][j]) {
+	for (let y = 0; y < 16; y++) {
+		for (let x = 0; x < 16; x++) {
+			const spriteName = tileIds[level[y][x]];
+			switch (level[y][x]) {
 				case nameToId.goal:
-					drawSprite(diamondsLeft > 0 ? 'goal' : 'goalunlocked', i * tileWidth, j * tileWidth);
+					drawSprite(diamondsLeft > 0 ? 'goal' : 'goalunlocked', x * tileWidth, y * tileWidth);
 					break;
 				case nameToId.air:
 					break;
@@ -102,13 +112,13 @@ export function renderLevel() {
 				case nameToId.pinkmonster:
 				case nameToId.bird:
 				case nameToId.jellyfish:
-					drawSprite(`${spriteName}1`, i * tileWidth, j * tileWidth);
+					drawSprite(`${spriteName}1`, x * tileWidth, y * tileWidth);
 					break;
 				case nameToId.player:
-					drawSprite('player', i * tileWidth + 3, j * tileWidth + 3);
+					drawSprite('player', x * tileWidth + 3, y * tileWidth + 3);
 					break;
 				default:
-					drawSprite(spriteName, i * tileWidth, j * tileWidth);
+					drawSprite(spriteName, x * tileWidth, y * tileWidth);
 					break;
 			}
 		}
@@ -126,7 +136,7 @@ export function renderLevel() {
 						drawSprite(`playerdie${deathAnimFrame}`, entity.x - 5, entity.y - 5);
 					}
 					if (deathTimer <= 0) {
-						loadLevel(currentLevel);
+						restartLevel();
 					}
 				} else {
 					drawSprite('player', entity.x - 2, entity.y - 2);
@@ -192,7 +202,7 @@ export function tickLevel() {
 					// Collision detection for floor while falling
 					const tileX = Math.floor(entity.x / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileX][tileY], true, tileX, tileY)) {
+					if (isSolid(level[tileY][tileX], true, tileX, tileY)) {
 						entity.y = Math.floor((entity.y) / tileWidth) * tileWidth - 2;
 	
 						// Lower jump if holding space
@@ -202,7 +212,7 @@ export function tickLevel() {
 					// Collision detection for ceiling while jumping
 					const tileX = Math.floor(entity.x / tileWidth);
 					const tileY = Math.floor((entity.y - 4) / tileWidth);
-					if (isSolid(level[tileX][tileY], true, tileX, tileY)) {
+					if (isSolid(level[tileY][tileX], true, tileX, tileY)) {
 						entity.y = Math.ceil((entity.y - 4) / tileWidth) * tileWidth + 2;
 						entity.yvel = 0;
 					}
@@ -212,13 +222,13 @@ export function tickLevel() {
 				if (entity.xvel > 0) {
 					const tileX = Math.floor((entity.x + 2) / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileX][tileY], true, tileX, tileY)) {
+					if (isSolid(level[tileY][tileX], true, tileX, tileY)) {
 						entity.xvel = 0;
 					}
 				} else {
 					const tileX = Math.floor((entity.x - 2) / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileX][tileY], true, tileX, tileY)) {
+					if (isSolid(level[tileY][tileX], true, tileX, tileY)) {
 						entity.xvel = 0;
 					}
 				}
@@ -226,9 +236,9 @@ export function tickLevel() {
 				// Collision detection for static tiles
 				const playerTileX = Math.floor(entity.x / tileWidth);
 				const playerTileY = Math.floor(entity.y / tileWidth);
-				switch (level[playerTileX][playerTileY]) {
+				switch (level[playerTileY][playerTileX]) {
 					case nameToId.diamond:
-						level[playerTileX][playerTileY] = 0;
+						level[playerTileY][playerTileX] = 0;
 
 						const now = performance.now();
 						if (now - lastDiamondCollectionTime < 500) {
@@ -278,7 +288,7 @@ export function tickLevel() {
 						entity.xvel = boosterHorizontalSpeed;
 						break;
 					case nameToId.boosterdown:
-						entity.yvel = boosterVerticalSpeed;;
+						entity.yvel = boosterVerticalSpeed;
 						break;
 					case nameToId.boosterleft:
 						entity.xvel = -boosterHorizontalSpeed;
@@ -289,7 +299,7 @@ export function tickLevel() {
 				for (const otherEntity of entities) {
 					if (isEntityPlatform(nameToId[otherEntity.type])) {
 						if (Math.abs(entity.x - otherEntity.x) < 7 && Math.abs(entity.y - otherEntity.y) < 7) {
-							entity.yvel = isKeyDown(' ') ? smallJumpVelocity : fullJumpVelocity + otherEntity.yTransferMomentum || 0;
+							entity.yvel = isKeyDown(' ') ? smallJumpVelocity : fullJumpVelocity + (otherEntity.yTransferMomentum || 0);
 						}
 					} else if (isEntityEnemy(nameToId[otherEntity.type])) {
 						if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
@@ -306,7 +316,7 @@ export function tickLevel() {
 			case 'pinkmonster':
 				const horizontalSpeed = entitySpeed[entity.type];
 				entity.x += entity.left ? -horizontalSpeed : horizontalSpeed;
-				if (isSolid(level[Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth)][Math.floor(entity.y / tileWidth)])) {
+				if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth)])) {
 					entity.left = !entity.left;
 				}
 
@@ -319,7 +329,7 @@ export function tickLevel() {
 				const verticalSpeed = entitySpeed[entity.type];
 				entity.y += entity.down ? -verticalSpeed : verticalSpeed;
 				entity.yTransferMomentum = (entity.down ? -1.5 : 1.5);
-				if (isSolid(level[Math.floor(entity.x / tileWidth)][Math.floor((entity.y + (entity.down ? -5 : 5)) / tileWidth)])) {
+				if (isSolid(level[Math.floor((entity.y + (entity.down ? -5 : 5)) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
 					entity.down = !entity.down;
 				}
 

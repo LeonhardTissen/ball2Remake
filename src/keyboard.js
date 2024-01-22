@@ -1,8 +1,14 @@
+import { toggleEditorMode } from "./level.js";
+
 export const keysHeld = new Set();
 
 export function initKeyboard() {
 	document.addEventListener('keydown', (e) => {
 		keysHeld.add(e.key);
+
+		if (e.key === 'e') {
+			toggleEditorMode();
+		}
 	});
 
 	document.addEventListener('keyup', (e) => {
