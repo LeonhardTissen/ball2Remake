@@ -23,12 +23,17 @@ let stunTimer = 0;
 const boosterVerticalSpeed = 4;
 const boosterHorizontalSpeed = 8;
 let score = 0;
+let editorMode = false;
 
 const fullJumpVelocity = -5.7;
 const smallJumpVelocity = -2;
 
 export function loadLevel(levelId) {
 	const testLevel = JSON.parse(JSON.stringify(levels[levelId]));
+	level = testLevel;
+
+	if (editorMode) return;
+
 	entities = [];
 	diamondsLeft = 0;
 	score = 0;
@@ -58,8 +63,12 @@ export function loadLevel(levelId) {
 						y: j * tileWidth + tileWidth / 2,
 						left: false,
 					});
+					break;
 				case nameToId.elevator1:
 				case nameToId.elevator2:
+				case nameToId.bird:
+				case nameToId.jellyfish:
+				case nameToId.lightning:
 					entities.push({
 						type: tileIds[testLevel[i][j]],
 						x: i * tileWidth + tileWidth / 2,
@@ -75,8 +84,6 @@ export function loadLevel(levelId) {
 			}
 		}
 	}
-
-	level = testLevel;
 }
 
 export function renderLevel() {
@@ -84,14 +91,30 @@ export function renderLevel() {
 
 	for (let i = 0; i < 16; i++) {
 		for (let j = 0; j < 16; j++) {
-			if (level[i][j] === nameToId.goal) {
-				drawSprite(diamondsLeft > 0 ? 'goal' : 'goalunlocked', i * tileWidth, j * tileWidth);
-			} else if (level[i][j] !== nameToId.air) {
-				const spriteName = tileIds[level[i][j]];
-				drawSprite(spriteName, i * tileWidth, j * tileWidth);
+			const spriteName = tileIds[level[i][j]];
+			switch (level[i][j]) {
+				case nameToId.goal:
+					drawSprite(diamondsLeft > 0 ? 'goal' : 'goalunlocked', i * tileWidth, j * tileWidth);
+					break;
+				case nameToId.air:
+					break;
+				case nameToId.crab:
+				case nameToId.pinkmonster:
+				case nameToId.bird:
+				case nameToId.jellyfish:
+					drawSprite(`${spriteName}1`, i * tileWidth, j * tileWidth);
+					break;
+				case nameToId.player:
+					drawSprite('player', i * tileWidth + 3, j * tileWidth + 3);
+					break;
+				default:
+					drawSprite(spriteName, i * tileWidth, j * tileWidth);
+					break;
 			}
 		}
 	}
+
+	if (editorMode) return;
 
 	for (const entity of entities) {
 		switch (entity.type) {
@@ -113,10 +136,13 @@ export function renderLevel() {
 			case 'horizontalmovingplatform2':
 			case 'elevator1':
 			case 'elevator2':
+			case 'lightning':
 				drawSprite(entity.type, entity.x - 5, entity.y - 5);
 				break;
 			case 'crab':
 			case 'pinkmonster':
+			case 'bird':
+			case 'jellyfish':
 				drawSprite(`${entity.type}${Math.floor(tick * 0.5) % 2 + 1}`, entity.x - 5, entity.y - 5);
 				break;
 		}
@@ -129,6 +155,8 @@ const horizontalPlayerSpeed = 2;
 
 export function tickLevel() {
 	tick ++;
+
+	if (editorMode) return;
 
 	for (const entity of entities) {
 		switch (entity.type) {
@@ -285,7 +313,10 @@ export function tickLevel() {
 				break;
 			case 'elevator1':
 			case 'elevator2':
-				const verticalSpeed = entity.type === 'elevator1' ? 1 : 2;
+			case 'bird':
+			case 'jellyfish':
+			case 'lightning':
+				const verticalSpeed = entitySpeed[entity.type];
 				entity.y += entity.down ? -verticalSpeed : verticalSpeed;
 				entity.yTransferMomentum = (entity.down ? -1.5 : 1.5);
 				if (isSolid(level[Math.floor(entity.x / tileWidth)][Math.floor((entity.y + (entity.down ? -5 : 5)) / tileWidth)])) {
