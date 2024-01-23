@@ -232,7 +232,7 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 		Object.keys(tileIds).map(x => parseInt(x)).forEach((tileId, i) => {
 			const x = i % levelRender.length;
 			const y = Math.floor(i / levelRender[0].length);
-			renderTile(tileId, x, y, context, editorMode, thumbnail);
+			renderTile(tileId, x, y, context, thumbnail);
 
 			if (editorCursor.x === x && editorCursor.y === y && buttonsHeld.has(0)) {
 				setCurrentEditorTile(tileId);
@@ -242,7 +242,7 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 
 		});
 	} else {
-		renderTiles(context, levelRender, editorMode, thumbnail);
+		renderTiles(context, levelRender, thumbnail);
 	}
 
 	if (thumbnail) return;
@@ -259,7 +259,7 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 	drawDigits(score, 2, cvs.height - 7, false, true);
 }
 
-function renderTile(tileId, x, y, context, editorMode, thumbnail) {
+function renderTile(tileId, x, y, context, thumbnail) {
 	const spriteName = tileIds[tileId];
 	switch (tileId) {
 		case nameToId.goal:

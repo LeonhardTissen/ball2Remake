@@ -19,6 +19,7 @@ export function initLevelMenu() {
 
 	fetch(apiURL).then(response => response.json()).then(data => {
 		data.forEach(({ name, data }) => {
+			levels[name] = JSON.parse(data);
 			createLevelButton(name, JSON.parse(data), onlineLevelElem);
 		});
 	});
