@@ -1,6 +1,6 @@
 import { sound } from "./audio.js";
 import { addInvisibleTile } from "./invisible.js";
-import { level } from "./level.js";
+import { entities, level } from "./level.js";
 import { createExplosionParticles } from "./particle.js";
 import { isTemporaryBlockActive } from "./temporaryblock.js";
 import { tileWidth } from "./tilewidth.js";
@@ -105,10 +105,21 @@ export function isSolid(tileId, playerCaused = false, bulletPower = false, tileX
 		}
 		
 	}
-	if (bulletPower && tileId === nameToId.explodableblock) {
-		level[tileY][tileX] = nameToId.air;
-		createExplosionParticles('explodableblock', tileX * tileWidth, tileY * tileWidth);
-		sound.play('BRE');
+	if (bulletPower) {
+		if (tileId === nameToId.explodableblock || tileId === nameToId.explodableblockbomb) {
+			if (tileId === nameToId.explodableblockbomb) {
+				// Spawn bomb
+				entities.push({
+					type: 'explodingbomb',
+					x: tileX * tileWidth + tileWidth / 2,
+					y: tileY * tileWidth + tileWidth / 2,
+					age: 0,
+				});
+			}
+			level[tileY][tileX] = nameToId.air;
+			createExplosionParticles('explodableblock', tileX * tileWidth, tileY * tileWidth);
+			sound.play('BRE');
+		}
 	}
 	return [
 		'grayblock',

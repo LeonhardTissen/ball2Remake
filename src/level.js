@@ -45,6 +45,17 @@ const springVelocity = 8.2;
 
 const gunCooldown = 8;
 
+const explodingBombNeighbours = [
+	[-1, -1],
+	[0, -1],
+	[1, -1],
+	[-1, 0],
+	[1, 0],
+	[-1, 1],
+	[0, 1],
+	[1, 1],
+];
+
 export function restartLevel() {
 	loadLevel(currentLevel);
 }
@@ -363,6 +374,9 @@ function renderEntities() {
 			case 'bullet':
 				drawSprite('bullet', entity.x - 2, entity.y - 3);
 				break;
+			case 'explodingbomb':
+				drawSprite(`explodingbomb${Math.floor(entity.age)}`, entity.x - 10, entity.y - 10);
+				break;
 			default:
 				drawSprite(entity.type, entity.x - 5, entity.y - 5);
 				break;
@@ -465,7 +479,7 @@ export function tickLevel() {
 						entity.portalFatigue = false;
 						break;
 					case nameToId.diamond:
-						level[playerTileY][playerTileX] = 0;
+						level[playerTileY][playerTileX] = nameToId.air;
 
 						const now = performance.now();
 						if (now - lastDiamondCollectionTime < 500) {
@@ -566,6 +580,17 @@ export function tickLevel() {
 							xvel: 2,
 						});
 						entity.gunCooldown = gunCooldown;
+						break;
+					case nameToId.bomb:
+						sound.play('Bom');
+						level[playerTileY][playerTileX] = nameToId.air;
+
+						entities.push({
+							type: 'explodingbomb',
+							x: playerTileX * tileWidth + tileWidth / 2,
+							y: playerTileY * tileWidth + tileWidth / 2,
+							age: 0,
+						});
 						break;
 				}
 
@@ -843,6 +868,40 @@ export function tickLevel() {
 							createExplosionParticles(explosionSprite, otherEntity.x - 5, otherEntity.y - 5);
 						}
 					}
+				}
+				break;
+			case 'explodingbomb':
+				entity.age+=0.5;
+				if (entity.age === 5) {
+					// Destruction starts
+					sound.play('BRE');
+
+					explodingBombNeighbours.forEach(([x, y]) => {
+						const tileX = Math.floor((entity.x + x * tileWidth) / tileWidth);
+						const tileY = Math.floor((entity.y + y * tileWidth) / tileWidth);
+						if (
+							level[tileY][tileX] === nameToId.explodableblock ||
+							level[tileY][tileX] === nameToId.explodableblockbomb
+						) {
+							if (level[tileY][tileX] === nameToId.explodableblockbomb) {
+								// Spawn another bomb
+								entities.push({
+									type: 'explodingbomb',
+									x: tileX * tileWidth + tileWidth / 2,
+									y: tileY * tileWidth + tileWidth / 2,
+									age: 0,
+								});
+							}
+							// Destroy block and cause explosion
+							level[tileY][tileX] = nameToId.air;
+							createExplosionParticles('explodableblock', tileX * tileWidth, tileY * tileWidth);
+
+						}
+					});
+				}
+				if (entity.age > 8) {
+					// Destroy bomb
+					entities.splice(entities.indexOf(entity), 1);
 				}
 				break;
 		}
