@@ -9,25 +9,26 @@ let levelMenuInitialized = false;
 const levelElem = document.getElementById('levels');
 const officialLevelElem = document.getElementById('official');
 const onlineLevelElem = document.getElementById('online');
+const otherLevelElem = document.getElementById('other');
 
 export function initLevelMenu() {
 	if (levelMenuInitialized) return;
 
 	Object.entries(levels).forEach(([levelName, level]) => {
-		createLevelButton(levelName, level, officialLevelElem)
+		createLevelButton(levelName, level, levelName.startsWith('level') ? officialLevelElem : otherLevelElem)
 	});
 
 	fetch(apiURL).then(response => response.json()).then(data => {
-		data.forEach(({ name, data }) => {
+		data.forEach(({ name, data, author }) => {
 			levels[name] = JSON.parse(data);
-			createLevelButton(name, JSON.parse(data), onlineLevelElem);
+			createLevelButton(name, JSON.parse(data), onlineLevelElem, author);
 		});
 	});
 
 	levelMenuInitialized = true;
 }
 
-function createLevelButton(levelName, level, categoryElem) {
+function createLevelButton(levelName, level, categoryElem, author = undefined) {
 	renderLevel(ctx, true, level);
 	const thumbnailData = generateThumbnail();
 	const levelContainer = document.createElement('div');
@@ -40,6 +41,12 @@ function createLevelButton(levelName, level, categoryElem) {
 	const levelNameElem = document.createElement('h2');
 	levelNameElem.innerText = levelName;
 	levelContainer.appendChild(levelNameElem);
+
+	if (author) {
+		const levelAuthorElem = document.createElement('p');
+		levelAuthorElem.innerText = `${author}`;
+		levelContainer.appendChild(levelAuthorElem);
+	}3
 
 	levelContainer.addEventListener('click', () => {
 		goToLevel(levelName);

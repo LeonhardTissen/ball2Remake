@@ -61,6 +61,45 @@ body {
 .level h2 {
 	margin: 0;
 }
+.level p {
+	margin: 0;
+	color: #999;
+}
 .hidden {
-	display: none;
+	display: none !important;
+}
+#upload {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(80vw, 80vh);
+	height: min(80vw, 80vh);
+	background-color: #000E;
+	overflow-y: scroll;
+	outline: 2px solid #222;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+input[type="text"] {
+	display: block;
+	text-align: left;
+	margin: 3px auto;
+	font-family: Pixel;
+	font-size: 24px;
+	background-color: black;
+	color: white;
+	width: 10ch;
+}
+button {
+	display: block;
+	margin: 10px auto;
+	font-family: Pixel;
+	font-size: 24px;
+	background-color: black;
+	color: white;
+	border: 2px solid #00B6E6;
 }

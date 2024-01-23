@@ -1,4 +1,3 @@
-import { apiURL } from "./api.js";
 import { drawSprite } from "./assets.js";
 import { ctx, cvs } from "./canvas.js";
 import { currentLevel, restartLevel } from "./level.js";
@@ -52,32 +51,4 @@ export function setCurrentEditorTile(tile) {
 
 export function exportLevel() {
 	return JSON.stringify(levels[currentLevel]);
-}
-
-export function uploadLevel() {
-	const levelName = prompt('Level name:');
-	if (!levelName) return;
-
-	if (levelName.length > 10) {
-		alert('Level name must be 10 characters or less.');
-		return;
-	}
-
-	// Submit form to API
-	const form = new FormData();
-	form.append('name', levelName);
-	form.append('data', exportLevel());
-	fetch(apiURL, {
-		method: 'POST',
-		body: form
-	}).then((response) => {
-		if (response.ok) {
-			alert('Level uploaded successfully!');
-		} else {
-			response.text().then((text) => {
-				console.log(`Error uploading level: ${text}`);
-			});
-		}
-	});
-
 }
