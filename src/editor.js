@@ -54,3 +54,4 @@ export function setCurrentEditorTile(tile) {
 export function exportLevel() {
 	return JSON.stringify(levels[currentLevel]);
 }
+window.exportLevel = exportLevel;
