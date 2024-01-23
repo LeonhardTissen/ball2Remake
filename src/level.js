@@ -232,7 +232,7 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 		Object.keys(tileIds).map(x => parseInt(x)).forEach((tileId, i) => {
 			const x = i % levelRender.length;
 			const y = Math.floor(i / levelRender[0].length);
-			renderTile(tileId, x, y);
+			renderTile(tileId, x, y, context, editorMode, thumbnail);
 
 			if (editorCursor.x === x && editorCursor.y === y && buttonsHeld.has(0)) {
 				setCurrentEditorTile(tileId);
@@ -242,7 +242,7 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 
 		});
 	} else {
-		renderTiles(context, levelRender, thumbnail);
+		renderTiles(context, levelRender, editorMode, thumbnail);
 	}
 
 	if (thumbnail) return;
@@ -259,7 +259,7 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 	drawDigits(score, 2, cvs.height - 7, false, true);
 }
 
-function renderTile(tileId, x, y, context, thumbnail) {
+function renderTile(tileId, x, y, context, editorMode, thumbnail) {
 	const spriteName = tileIds[tileId];
 	switch (tileId) {
 		case nameToId.goal:
@@ -282,7 +282,7 @@ function renderTile(tileId, x, y, context, thumbnail) {
 			drawSprite('player', x * tileWidth + 3, y * tileWidth + 3, context);
 			break;
 		case nameToId.invisibleblock:
-			if (isTileInvisible(x, y) || thumbnail) {
+			if (isTileInvisible(x, y) || editorMode || thumbnail) {
 				drawSprite('invisibleblock', x * tileWidth, y * tileWidth, context);
 			}
 			break;
