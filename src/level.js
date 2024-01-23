@@ -880,6 +880,7 @@ export function tickLevel() {
 						}
 						break;
 				}
+				break;
 			case 'laser':
 				// Check if player is to the right of the laser
 				playerEntity = entities.find(e => e.type === 'player');
