@@ -8,24 +8,6 @@ export const keysHeld = new Set();
 export function initKeyboard() {
 	document.addEventListener('keydown', (e) => {
 		keysHeld.add(e.key);
-
-		if (e.key === 'e') {
-			toggleEditorMode();
-		} else if (e.key === '1') {
-			toggleTileMenu();
-		} else if (e.key === '2') {
-			const exportedLevel = exportLevel();
-			console.log(exportedLevel);
-		} else if (e.key === '3') {
-			initLevelMenu();
-			toggleLevelMenu();
-		} else if (e.key === '4') {
-			toggleUploadMenu();
-		} else if (e.key === 'm') {
-			goToNextLevel();
-		} else if (e.key === 'n') {
-			goToFirstLevel();
-		}
 	});
 
 	document.addEventListener('keyup', (e) => {
