@@ -169,6 +169,15 @@ export function loadLevel(levelId) {
 						left: true,
 					});
 					break;
+				case nameToId.redmonster:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						down: true,
+						left: true,
+					});
+					break;
 			}
 
 			if (isEntity(testLevel[y][x])) {
@@ -580,6 +589,29 @@ export function tickLevel() {
 					entity.left = true;
 				} else if (entity.xVel < -3) {
 					entity.left = false;
+				}
+				break;
+			case 'redmonster':
+				const redMonsterSpeed = 1;
+				entity.x += entity.left ? -redMonsterSpeed : redMonsterSpeed;
+				entity.y += entity.down ? redMonsterSpeed : -redMonsterSpeed;
+				if (entity.down) {
+					if (isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+						entity.down = false;
+					}
+				} else {
+					if (isSolid(level[Math.floor((entity.y - 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+						entity.down = true;
+					}
+				}
+				if (entity.left) {
+					if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x - 5) / tileWidth)])) {
+						entity.left = false;
+					}
+				} else {
+					if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + 5) / tileWidth)])) {
+						entity.left = true;
+					}
 				}
 				break;
 		}
