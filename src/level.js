@@ -205,10 +205,20 @@ export function loadLevel(levelId) {
 					});
 					break;
 				case nameToId.laser:
+				case nameToId.peaplatform:
 					entities.push({
 						type: spriteName,
 						x: x * tileWidth + tileWidth / 2,
 						y: y * tileWidth + tileWidth / 2,
+					});
+					break;
+				case nameToId.spinningplatform:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						originX: x * tileWidth + tileWidth / 2,
+						originY: y * tileWidth + tileWidth / 2,
 					});
 					break;
 			}
@@ -656,6 +666,11 @@ export function tickLevel() {
 					entity.down = !entity.down;
 				}
 
+				break;
+			case 'spinningplatform':
+				const spinningSpeed = 0.25;
+				entity.x = entity.originX + Math.sin(tick * spinningSpeed) * tileWidth;
+				entity.y = entity.originY + Math.cos(tick * spinningSpeed) * tileWidth;
 				break;
 			case 'crusher':
 				// Check if player below

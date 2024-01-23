@@ -14,7 +14,7 @@ export const tileIds = {
 	6: 'launcherleft',
 	7: 'star',
 	8: 'bomb',
-	9: 'spinningplatform',
+	9: 'peaplatform',
 	10: 'boosterup',
 	11: 'boosterright',
 	12: 'boosterdown',
@@ -172,6 +172,8 @@ export function isEntity(tileId) {
 		'crusher',
 		'rollingball',
 		'laser',
+		'spinningplatform',
+		'peaplatform',
 	].includes(tileIds[tileId]);
 }
 
@@ -181,6 +183,8 @@ export function isEntityPlatform(tileId) {
 		'horizontalmovingplatform2',
 		'elevator1',
 		'elevator2',
+		'spinningplatform',
+		'peaplatform',
 	].includes(tileIds[tileId]);
 }
 
