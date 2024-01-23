@@ -84,7 +84,14 @@ export function goToLevel(levelId) {
 
 export function loadLevel(levelId) {
 	currentLevel = levelId;
-	const testLevel = JSON.parse(JSON.stringify(levels[levelId]));
+	const levelData = levels[levelId];
+
+	if (!levelData) {
+		alert(`Level ${levelId} not found`);
+		return;
+	}
+
+	const testLevel = JSON.parse(JSON.stringify(levelData));
 	level = testLevel;
 
 	if (editorMode) return;

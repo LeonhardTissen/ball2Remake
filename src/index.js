@@ -12,12 +12,18 @@ import { getHighestLevel } from "./localstorage.js";
 
 const ticksPerSecond = 30;
 
-
 loadAssets().then(() => {
 	initKeyboard();
 	initUI();
-	const levelToStart = getHighestLevel();
-	loadLevel(`level${levelToStart}`);
+
+	const levelUrl = window.location.hash.slice(1);
+	if (levelUrl !== "") {
+		loadLevel(levelUrl);
+	} else {
+		const levelToStart = getHighestLevel();
+		loadLevel(`level${levelToStart}`);
+	}
+
 	loop();
 	setInterval(tickLevel, 1000 / ticksPerSecond);
 });
