@@ -338,6 +338,13 @@ export function tickLevel() {
 					starTimer --;
 				}
 
+				// Edge of screen death
+				if (entity.x < 0 || entity.y < 0 || entity.x > cvs.width || entity.y > cvs.height) {
+					sound.play('KICK');
+					deathTimer = deathTimerLength;
+					break;
+				}
+
 				if (entity.yvel > 0) {
 					// Collision detection for floor while falling
 					const tileX = Math.floor(entity.x / tileWidth);
