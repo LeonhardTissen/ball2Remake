@@ -8,13 +8,16 @@ import './audio.js';
 import './mouse.js';
 import { ctx } from "./canvas.js";
 import { initUI } from "./ui.js";
+import { getHighestLevel } from "./localstorage.js";
 
 const ticksPerSecond = 30;
+
 
 loadAssets().then(() => {
 	initKeyboard();
 	initUI();
-	loadLevel('level1');
+	const levelToStart = getHighestLevel();
+	loadLevel(`level${levelToStart}`);
 	loop();
 	setInterval(tickLevel, 1000 / ticksPerSecond);
 });

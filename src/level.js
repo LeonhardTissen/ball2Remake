@@ -5,6 +5,7 @@ import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, s
 import { clearInvensibleTiles, isTileInvisible } from "./invisible.js";
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
+import { setNewHighestLevel } from "./localstorage.js";
 import { buttonsHeld } from "./mouse.js";
 import { clearParticles, createExplosionParticles, renderExplosionParticles } from "./particle.js";
 import { isTemporaryBlockActive } from "./temporaryblock.js";
@@ -67,6 +68,7 @@ export function goToNextLevel() {
 	const nextLevelId = `level${nextLevelNum}`;
 	if (levels[nextLevelId]) {
 		loadLevel(nextLevelId);
+		setNewHighestLevel(nextLevelNum)
 	} else {
 		loadLevel(currentLevel);
 	}
