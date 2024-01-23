@@ -55,6 +55,10 @@ export function goToFirstLevel() {
 	loadLevel('level1');
 }
 
+export function goToLevel(levelId) {
+	loadLevel(levelId);
+}
+
 export function loadLevel(levelId) {
 	currentLevel = levelId;
 	const testLevel = JSON.parse(JSON.stringify(levels[levelId]));

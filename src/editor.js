@@ -37,12 +37,7 @@ export function renderEditor() {
 }
 
 export function generateThumbnail() {
-	if (!editorMode) {
-		return;
-	}
-
-	const url = cvs.toDataURL();
-	window.open(url, '_blank');
+	return cvs.toDataURL();
 }
 
 export function setEditorCursor(x, y) {

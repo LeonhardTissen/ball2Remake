@@ -1,3 +1,7 @@
+@font-face {
+	font-family: "Pixel";
+	src: url("slkscre.ttf");
+}
 body {
 	background-color: #090909;
 	color: #fff;
@@ -8,6 +12,7 @@ body {
 	justify-content: center;
 	align-items: center;
 	min-height: 100vh;
+	font-family: "Pixel";
 }
 #game {
 	image-rendering: pixelated;
@@ -32,4 +37,30 @@ body {
 	border-radius: 50%;
 	width: min(200px, 20vw);
 	margin: 10px
+}
+#levels {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(100vw, 100vh);
+	height: min(100vw, 100vh);
+	background-color: #000;
+	overflow-y: scroll;
+	outline: 2px solid #222;
+	text-align: center;
+}
+.level {
+	display: inline-block;
+	text-align: center;
+	cursor: pointer;
+}
+.level:hover {
+	background-color: #4443;
+}
+.level h2 {
+	margin: 0;
+}
+.hidden {
+	display: none;
 }

@@ -1,6 +1,6 @@
-import { ctx } from "./canvas.js";
-import { exportLevel, generateThumbnail, toggleEditorMode, toggleTileMenu } from "./editor.js";
-import { goToFirstLevel, goToNextLevel, renderLevel } from "./level.js";
+import { exportLevel, toggleEditorMode, toggleTileMenu } from "./editor.js";
+import { goToFirstLevel, goToNextLevel } from "./level.js";
+import { initLevelMenu, toggleLevelMenu } from "./levelmenu.js";
 
 export const keysHeld = new Set();
 
@@ -16,8 +16,8 @@ export function initKeyboard() {
 			const exportedLevel = exportLevel();
 			console.log(exportedLevel);
 		} else if (e.key === '3') {
-			renderLevel(ctx, true);
-			generateThumbnail();
+			initLevelMenu();
+			toggleLevelMenu();
 		} else if (e.key === 'm') {
 			goToNextLevel();
 		} else if (e.key === 'n') {
