@@ -1,4 +1,5 @@
 import { sound } from "./audio.js";
+import { addInvisibleTile } from "./invisible.js";
 import { level } from "./level.js";
 import { createExplosionParticles } from "./particle.js";
 import { tileWidth } from "./tilewidth.js";
@@ -90,11 +91,20 @@ export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
 	return acc;
 }, {});
 
-export function isSolid(tileId, playerCaused = false, tileX = null, tileY = null) {
-	if (playerCaused && tileId === nameToId.breakableblock) {
+export function isSolid(tileId, playerCaused = false, bulletPower = false, tileX = null, tileY = null) {
+	if (playerCaused) {
+		if (tileId === nameToId.breakableblock) {
+			level[tileY][tileX] = nameToId.air;
+			createExplosionParticles('breakableblock', tileX * tileWidth, tileY * tileWidth);
+			sound.play('TI');
+		} else if (tileId === nameToId.invisibleblock) {
+			addInvisibleTile(tileX, tileY);
+		}
+	}
+	if (bulletPower && tileId === nameToId.explodableblock) {
 		level[tileY][tileX] = nameToId.air;
-		createExplosionParticles('breakableblock', tileX * tileWidth, tileY * tileWidth);
-		sound.play('TI');
+		createExplosionParticles('explodableblock', tileX * tileWidth, tileY * tileWidth);
+		sound.play('BRE');
 	}
 	return [
 		'grayblock',

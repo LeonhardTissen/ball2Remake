@@ -2,6 +2,7 @@ import { drawRotatedSprite, drawSprite } from "./assets.js";
 import { sound } from "./audio.js";
 import { ctx, cvs } from "./canvas.js";
 import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, setCurrentEditorTile } from "./editor.js";
+import { clearInvensibleTiles, isTileInvisible } from "./invisible.js";
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
 import { buttonsHeld } from "./mouse.js";
@@ -13,6 +14,7 @@ import { tileWidth } from "./tilewidth.js";
 
 export let level = null;
 export let entities = [];
+let portals = null;
 
 let lastDiamondCollectionTime = 0;
 let diamondsLeft = 0;
@@ -39,6 +41,8 @@ const starTimerLength = 150;
 const fullJumpVelocity = -5.7;
 const smallJumpVelocity = -1.9;
 const springVelocity = 8.2;
+
+const gunCooldown = 8;
 
 export function restartLevel() {
 	loadLevel(currentLevel);
@@ -69,6 +73,11 @@ export function loadLevel(levelId) {
 	entities = [];
 	diamondsLeft = 0;
 	score = 0;
+	portals = {
+		horizonal: {},
+		vertical: {},
+	};
+	clearInvensibleTiles();
 
 	for (let y = 0; y < testLevel.length; y++) {
 		for (let x = 0; x < testLevel[y].length; x++) {
@@ -78,6 +87,20 @@ export function loadLevel(levelId) {
 				case nameToId.diamond:
 					diamondsLeft++;
 					break;
+				case nameToId.portalhorizontal:
+					if (!portals.horizonal[y]) {
+						portals.horizonal[y] = [x];
+					} else {
+						portals.horizonal[y].push(x);
+					}
+					break;
+				case nameToId.portalvertical:
+					if (!portals.vertical[x]) {
+						portals.vertical[x] = [y];
+					} else {
+						portals.vertical[x].push(y);
+					}
+					break;
 				case nameToId.player:
 					entities.push({
 						type: spriteName,
@@ -85,6 +108,8 @@ export function loadLevel(levelId) {
 						y: y * tileWidth + tileWidth / 2,
 						xvel: 0,
 						yvel: 0,
+						portalFatigue: false,
+						gunCooldown: 0,
 					});
 					break;
 				case nameToId.horizontalmovingplatform1:
@@ -158,6 +183,7 @@ export function loadLevel(levelId) {
 						x: x * tileWidth + tileWidth / 2,
 						y: y * tileWidth + tileWidth / 2,
 						left: false,
+						portalFatigue: false,
 					});
 					break;
 				case nameToId.wasp:
@@ -216,7 +242,7 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 
 		});
 	} else {
-		renderTiles(context, levelRender);
+		renderTiles(context, levelRender, thumbnail);
 	}
 
 	if (thumbnail) return;
@@ -233,7 +259,7 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 	drawDigits(score, 2, cvs.height - 7, false, true);
 }
 
-function renderTile(tileId, x, y, context) {
+function renderTile(tileId, x, y, context, thumbnail) {
 	const spriteName = tileIds[tileId];
 	switch (tileId) {
 		case nameToId.goal:
@@ -255,16 +281,21 @@ function renderTile(tileId, x, y, context) {
 		case nameToId.player:
 			drawSprite('player', x * tileWidth + 3, y * tileWidth + 3, context);
 			break;
+		case nameToId.invisibleblock:
+			if (isTileInvisible(x, y) || thumbnail) {
+				drawSprite('invisibleblock', x * tileWidth, y * tileWidth, context);
+			}
+			break;
 		default:
 			drawSprite(spriteName, x * tileWidth, y * tileWidth, context);
 			break;
 	}
 }
 
-function renderTiles(context, level) {
+function renderTiles(context, level, thumbnail = false) {
 	for (let y = 0; y < level.length; y++) {
 		for (let x = 0; x < level[0].length; x++) {
-			renderTile(level[y][x], x, y, context)
+			renderTile(level[y][x], x, y, context, thumbnail)
 		}
 	}
 }
@@ -312,6 +343,9 @@ function renderEntities() {
 					entity.springTimer--;
 				}
 				drawSprite(`spring${entity.springTimer > 0 ? 2 : 1}`, entity.x - 5, entity.y - 5);
+				break;
+			case 'bullet':
+				drawSprite('bullet', entity.x - 2, entity.y - 3);
 				break;
 			default:
 				drawSprite(entity.type, entity.x - 5, entity.y - 5);
@@ -361,6 +395,9 @@ export function tickLevel() {
 				if (starTimer > 0) {
 					starTimer --;
 				}
+				if (entity.gunCooldown > 0) {
+					entity.gunCooldown --;
+				} 
 
 				// Edge of screen death
 				if (entity.x < 0 || entity.y < 0 || entity.x > cvs.width || entity.y > cvs.height) {
@@ -373,7 +410,7 @@ export function tickLevel() {
 					// Collision detection for floor while falling
 					const tileX = Math.floor(entity.x / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileY][tileX], true, tileX, tileY)) {
+					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
 						entity.y = Math.floor((entity.y) / tileWidth) * tileWidth - 2;
 	
 						// Lower jump if holding space
@@ -383,7 +420,7 @@ export function tickLevel() {
 					// Collision detection for ceiling while jumping
 					const tileX = Math.floor(entity.x / tileWidth);
 					const tileY = Math.floor((entity.y - 4) / tileWidth);
-					if (isSolid(level[tileY][tileX], true, tileX, tileY)) {
+					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
 						entity.y = Math.ceil((entity.y - 4) / tileWidth) * tileWidth + 2;
 						entity.yvel = 0;
 					}
@@ -393,13 +430,13 @@ export function tickLevel() {
 				if (entity.xvel > 0) {
 					const tileX = Math.floor((entity.x + 2) / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileY][tileX], true, tileX, tileY)) {
+					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
 						entity.xvel = 0;
 					}
 				} else {
 					const tileX = Math.floor((entity.x - 2) / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileY][tileX], true, tileX, tileY)) {
+					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
 						entity.xvel = 0;
 					}
 				}
@@ -408,6 +445,9 @@ export function tickLevel() {
 				const playerTileX = Math.floor(entity.x / tileWidth);
 				const playerTileY = Math.floor(entity.y / tileWidth);
 				switch (level[playerTileY][playerTileX]) {
+					case nameToId.air:
+						entity.portalFatigue = false;
+						break;
 					case nameToId.diamond:
 						level[playerTileY][playerTileX] = 0;
 
@@ -477,6 +517,40 @@ export function tickLevel() {
 					case nameToId.boosterleft:
 						entity.xvel = -boosterHorizontalSpeed;
 						break;
+					case nameToId.portalhorizontal:
+						if (entity.portalFatigue) break;
+						const portalX = portals.horizonal[playerTileY].find(x => x !== playerTileX);
+						if (portalX) {
+							entity.x = portalX * tileWidth + tileWidth / 2;
+							entity.y = playerTileY * tileWidth + tileWidth / 2;
+							entity.portalFatigue = true;
+						}
+						break;
+					case nameToId.portalvertical:
+						if (entity.portalFatigue) break;
+						const portalY = portals.vertical[playerTileX].find(y => y !== playerTileY);
+						if (portalY) {
+							entity.x = playerTileX * tileWidth + tileWidth / 2;
+							entity.y = portalY * tileWidth + tileWidth / 2;
+							entity.portalFatigue = true;
+						}
+						break;
+					case nameToId.gun:
+						if (entity.gunCooldown > 0) break;
+						entities.push({
+							type: 'bullet',
+							x: playerTileX * tileWidth + tileWidth / 2,
+							y: playerTileY * tileWidth + tileWidth / 2,
+							xvel: -2,
+						});
+						entities.push({
+							type: 'bullet',
+							x: playerTileX * tileWidth + tileWidth / 2,
+							y: playerTileY * tileWidth + tileWidth / 2,
+							xvel: 2,
+						});
+						entity.gunCooldown = gunCooldown;
+						break;
 				}
 
 				// Collision with other entities
@@ -543,6 +617,32 @@ export function tickLevel() {
 						entity.left = !entity.left;
 					}
 				}
+				const ballTileX = Math.floor(entity.x / tileWidth);
+				const ballTileY = Math.floor(entity.y / tileWidth);
+				switch (level[ballTileY][ballTileX]) {
+					case nameToId.air:
+						entity.portalFatigue = false;
+						break;
+					case nameToId.portalhorizontal:
+						if (entity.portalFatigue) break;
+						const portalX = portals.horizonal[ballTileY].find(x => x !== ballTileX);
+						if (portalX) {
+							entity.x = portalX * tileWidth + tileWidth / 2;
+							entity.y = ballTileY * tileWidth + tileWidth / 2;
+							entity.portalFatigue = true;
+						}
+						break;
+					case nameToId.portalvertical:
+						if (entity.portalFatigue) break;
+						const portalY = portals.vertical[ballTileX].find(y => y !== ballTileY);
+						if (portalY) {
+							entity.x = ballTileX * tileWidth + tileWidth / 2;
+							entity.y = portalY * tileWidth + tileWidth / 2;
+							entity.portalFatigue = true;
+						}
+						break;
+				}
+					
 				break;
 			case 'elevator1':
 			case 'elevator2':
@@ -602,19 +702,23 @@ export function tickLevel() {
 				entity.x += entity.left ? -redMonsterSpeed : redMonsterSpeed;
 				entity.y += entity.down ? redMonsterSpeed : -redMonsterSpeed;
 				if (entity.down) {
+					// Floor collision
 					if (isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
 						entity.down = false;
 					}
 				} else {
+					// Ceiling collision
 					if (isSolid(level[Math.floor((entity.y - 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
 						entity.down = true;
 					}
 				}
 				if (entity.left) {
+					// Left wall collision
 					if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x - 5) / tileWidth)])) {
 						entity.left = false;
 					}
 				} else {
+					// Right wall collision
 					if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + 5) / tileWidth)])) {
 						entity.left = true;
 					}
@@ -658,9 +762,7 @@ export function tickLevel() {
 				// Check if player is to the right of the laser
 				playerEntity = entities.find(e => e.type === 'player');
 
-				if (deathTimer > 0) {
-
-				} else {
+				if (deathTimer === 0) {
 					if (playerEntity.x > entity.x && playerEntity.y > entity.y - 5 && playerEntity.y < entity.y + 5) {
 						// Recursively check if laser can reach player (Check for any solid walls in the way)
 						const playerTileX = Math.floor(playerEntity.x / tileWidth);
@@ -697,6 +799,27 @@ export function tickLevel() {
 									y: y * tileWidth + tileWidth / 2,
 								});
 							})
+						}
+					}
+				}
+				break;
+			case 'bullet':
+				entity.x += entity.xvel;
+				const bulletTileX = Math.floor(entity.x / tileWidth);
+				const bulletTileY = Math.floor(entity.y / tileWidth);
+				// Kill bullet if collide with solid tile
+				if (isSolid(level[bulletTileY][bulletTileX], true, true, bulletTileX, bulletTileY)) {
+					entities.splice(entities.indexOf(entity), 1);
+				}
+				// Kill enemy if collide
+				for (const otherEntity of entities) {
+					if (isEntityEnemy(nameToId[otherEntity.type])) {
+						if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
+							sound.play('DIE');
+							entities.splice(entities.indexOf(otherEntity), 1);
+							entities.splice(entities.indexOf(entity), 1);
+							const explosionSprite = isEntityAnimated(nameToId[otherEntity.type]) ? `${otherEntity.type}1` : otherEntity.type;
+							createExplosionParticles(explosionSprite, otherEntity.x - 5, otherEntity.y - 5);
 						}
 					}
 				}
