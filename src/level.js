@@ -175,7 +175,7 @@ export function loadLevel(levelId) {
 						type: spriteName,
 						x: x * tileWidth + tileWidth / 2,
 						y: y * tileWidth + tileWidth / 2,
-						direction: 'up',
+						direction: 'right',
 					});
 					break;
 				case nameToId.crusher:
