@@ -19,8 +19,8 @@ export function initUI() {
 		buttonElement.id = 'button' + buttonName;
 		buttonElement.classList.add(editorButtons.includes(buttonName) ? 'editorButton' : 'gameButton');
 
-		buttonElement.width = 5;
-		buttonElement.height = 5;
+		buttonElement.width = 7;
+		buttonElement.height = 7;
 
 		drawSprite(`icon${buttonName}`, 0, 0, ctx);
 

@@ -120,12 +120,11 @@ button {
 	pointer-events: none;
 }
 #ui canvas {
-	width: 40px;
-	height: 40px;
+	width: 4%;
+	height: 4%;
 	image-rendering: pixelated;
-	padding: 4px;
-	margin: 6px 2px;
+	padding-block: 1%;
+	margin: 0.5%;
 	cursor: pointer;
 	pointer-events: all;
-	filter: drop-shadow(0 8px black) drop-shadow(0 -8px black) drop-shadow(8px 0 black) drop-shadow(-8px 0 black);
 }
