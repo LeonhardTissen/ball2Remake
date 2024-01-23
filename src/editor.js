@@ -6,6 +6,7 @@ import { buttonsHeld } from "./mouse.js";
 import { tick } from "./tick.js";
 import { nameToId } from "./tiles.js";
 import { tileWidth } from "./tilewidth.js";
+import { setButtonVisibility } from "./ui.js";
 
 export let editorMode = false;
 export let showTileMenu = false;
@@ -18,6 +19,7 @@ export const editorCursor = {
 
 export function toggleEditorMode() {
 	editorMode = !editorMode;
+	setButtonVisibility(editorMode);
 	restartLevel();
 }
 

@@ -103,3 +103,28 @@ button {
 	color: white;
 	border: 2px solid #00B6E6;
 }
+#ui {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(100vw, 100vh);
+	height: min(100vw, 100vh);
+	overflow-y: scroll;
+	text-align: center;
+	display: flex;
+	flex-direction: row;
+	justify-content: end;
+	align-items: end;
+	pointer-events: none;
+}
+#ui canvas {
+	width: 40px;
+	height: 40px;
+	image-rendering: pixelated;
+	padding: 4px;
+	margin: 6px 2px;
+	cursor: pointer;
+	pointer-events: all;
+	filter: drop-shadow(0 8px black) drop-shadow(0 -8px black) drop-shadow(8px 0 black) drop-shadow(-8px 0 black);
+}
