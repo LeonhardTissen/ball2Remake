@@ -6,7 +6,7 @@ import { clearInvensibleTiles, isTileInvisible } from "./invisible.js";
 import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
 import { buttonsHeld } from "./mouse.js";
-import { createExplosionParticles, renderExplosionParticles } from "./particle.js";
+import { clearParticles, createExplosionParticles, renderExplosionParticles } from "./particle.js";
 import { isTemporaryBlockActive } from "./temporaryblock.js";
 import { addTextEntity, drawDigits } from "./text.js";
 import { advanceTick, tick } from "./tick.js";
@@ -44,6 +44,7 @@ const smallJumpVelocity = -1.9;
 const springVelocity = 8.2;
 
 const gunCooldown = 8;
+let timeouts = [];
 
 const explodingBombNeighbours = [
 	[-1, -1],
@@ -89,6 +90,9 @@ export function loadLevel(levelId) {
 		horizonal: {},
 		vertical: {},
 	};
+	timeouts.forEach(clearTimeout);
+	timeouts = [];
+	clearParticles();
 	clearInvensibleTiles();
 
 	for (let y = 0; y < testLevel.length; y++) {
@@ -122,6 +126,7 @@ export function loadLevel(levelId) {
 						yvel: 0,
 						portalFatigue: false,
 						gunCooldown: 0,
+						earthquakeTokens: 0,
 					});
 					break;
 				case nameToId.horizontalmovingplatform1:
@@ -591,6 +596,41 @@ export function tickLevel() {
 							y: playerTileY * tileWidth + tileWidth / 2,
 							age: 0,
 						});
+						break;
+					case nameToId.earthquaketoken:
+						entity.earthquakeTokens++;
+						level[playerTileY][playerTileX] = nameToId.air;
+
+						if (entity.earthquakeTokens === 3) {
+							entity.earthquakeTokens ++;
+							// Destroy all explodable blocks
+							for (let y = 0; y < level.length; y++) {
+								for (let x = 0; x < level[y].length; x++) {
+									timeouts.push(setTimeout(() => {
+										if (editorMode) return;
+										if (
+											level[y][x] === nameToId.explodableblock ||
+											level[y][x] === nameToId.explodableblockbomb ||
+											level[y][x] === nameToId.breakableblock
+										) {
+											if (level[y][x] === nameToId.explodableblockbomb) {
+												entities.push({
+													type: 'explodingbomb',
+													x: x * tileWidth + tileWidth / 2,
+													y: y * tileWidth + tileWidth / 2,
+													age: 0,
+												});
+											}
+											level[y][x] = nameToId.air;
+											sound.play('BRE');
+											createExplosionParticles('explodableblock', x * tileWidth, y * tileWidth);
+										}
+									}, Math.random() * 3000));
+								}
+							}
+						} else {
+							sound.play('ITM');
+						}
 						break;
 				}
 

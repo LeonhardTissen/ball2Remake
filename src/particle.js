@@ -19,6 +19,10 @@ particleBuffer.height = tileWidth;
 const pctx = particleBuffer.getContext('2d');
 const s = tileWidth / 2;
 
+export function clearParticles() {
+	explosionParticles.length = 0;
+}
+
 export function renderExplosionParticles() {
 
 	for (const particle of explosionParticles) {
