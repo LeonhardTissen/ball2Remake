@@ -55,8 +55,8 @@ if ('ontouchstart' in document.documentElement) {
 			ev.preventDefault();
 		});
 	}
-} else {
-	document.getElementById('mobile').style.display = 'none';
+
+	document.getElementById('mobile').style.display = 'block';
 }
 
 document.body.oncontextmenu = () => false;
