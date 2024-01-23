@@ -21,8 +21,8 @@ let lastDiamondCollectionTime = 0;
 let diamondsLeft = 0;
 let diamondScore = 0;
 
-const launcherSpeed = 7;
-const launcherStun = 3;
+const launcherSpeed = 5;
+const launcherStun = 7;
 let stunTimer = 0;
 
 let deathTimer = 0;
@@ -69,7 +69,7 @@ export function goToNextLevel() {
 }
 
 export function goToFirstLevel() {
-	loadLevel('level1');
+	loadLevel('level3');
 }
 
 export function goToLevel(levelId) {
@@ -405,10 +405,11 @@ export function tickLevel() {
 				entity.y += entity.yvel;
 				if (stunTimer > 0) {
 					stunTimer --;
+					entity.yvel = 0;
 				} else {
 					entity.xvel *= 0.6;
+					entity.yvel *= 0.95;
 				}
-				entity.yvel *= 0.95;
 				entity.yvel += 0.3;
 
 				if (entity.xvel < 0.1 && entity.xvel > -0.1) {
@@ -439,6 +440,24 @@ export function tickLevel() {
 					sound.play('KICK');
 					deathTimer = deathTimerLength;
 					break;
+				}
+
+				// Collision for walls while moving fast
+				const dampeningLookAhead = 5;
+				if (entity.xvel > 3) {
+					const tileX = Math.floor((entity.x + dampeningLookAhead) / tileWidth);
+					const tileY = Math.floor(entity.y / tileWidth);
+					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
+						entity.x = Math.floor(entity.x / tileWidth) * tileWidth + 8;
+						entity.xvel = 0;
+					}
+				} else if (entity.xvel < -3) {
+					const tileX = Math.floor((entity.x - dampeningLookAhead) / tileWidth);
+					const tileY = Math.floor(entity.y / tileWidth);
+					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
+						entity.x = Math.floor(entity.x / tileWidth) * tileWidth + 2;
+						entity.xvel = 0;
+					}
 				}
 
 				if (entity.yvel > 0) {
@@ -523,14 +542,14 @@ export function tickLevel() {
 					case nameToId.launcherright:
 						entity.xvel = launcherSpeed;
 						entity.yvel = -1;
-						entity.x = playerTileX * tileWidth + tileWidth / 2;
+						entity.x = playerTileX * tileWidth + tileWidth / 2 + 5;
 						entity.y = playerTileY * tileWidth + tileWidth / 2;
 						stunTimer = launcherStun;
 						break;
 					case nameToId.launcherleft:
 						entity.xvel = -launcherSpeed;
 						entity.yvel = -1;
-						entity.x = playerTileX * tileWidth + tileWidth / 2;
+						entity.x = playerTileX * tileWidth + tileWidth / 2 - 5;
 						entity.y = playerTileY * tileWidth + tileWidth / 2;
 						stunTimer = launcherStun;
 						break;
