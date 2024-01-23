@@ -67,6 +67,8 @@ export function goToNextLevel() {
 	const nextLevelId = `level${nextLevelNum}`;
 	if (levels[nextLevelId]) {
 		loadLevel(nextLevelId);
+	} else {
+		loadLevel(currentLevel);
 	}
 }
 
