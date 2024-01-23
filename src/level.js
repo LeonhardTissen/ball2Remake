@@ -160,6 +160,15 @@ export function loadLevel(levelId) {
 						left: false,
 					});
 					break;
+				case nameToId.wasp:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						xVel: 3,
+						left: true,
+					});
+					break;
 			}
 
 			if (isEntity(testLevel[y][x])) {
@@ -561,6 +570,16 @@ export function tickLevel() {
 							entity.y -= 1;
 						}
 						break;
+				}
+				break;
+			case 'wasp':
+				const waspSpeedChange = 0.5;
+				entity.x += entity.xVel;
+				entity.xVel += entity.left ? -waspSpeedChange : waspSpeedChange;
+				if (entity.xVel > 3) {
+					entity.left = true;
+				} else if (entity.xVel < -3) {
+					entity.left = false;
 				}
 				break;
 		}
