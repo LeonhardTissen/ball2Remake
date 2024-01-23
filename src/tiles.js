@@ -213,3 +213,10 @@ export const entitySpeed = {
 	elevator1: 1,
 	elevator2: 2,
 };
+
+export const tileRotations = {
+	'up': 0,
+	'right': Math.PI / 2,
+	'down': Math.PI,
+	'left': -Math.PI / 2,
+};

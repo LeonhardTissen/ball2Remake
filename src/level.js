@@ -1,4 +1,4 @@
-import { drawSprite } from "./assets.js";
+import { drawRotatedSprite, drawSprite } from "./assets.js";
 import { sound } from "./audio.js";
 import { ctx, cvs } from "./canvas.js";
 import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, setCurrentEditorTile } from "./editor.js";
@@ -8,7 +8,7 @@ import { buttonsHeld } from "./mouse.js";
 import { createExplosionParticles, renderExplosionParticles } from "./particle.js";
 import { addTextEntity, drawDigits } from "./text.js";
 import { advanceTick, tick } from "./tick.js";
-import { entitySpeed, isEntity, isEntityAnimated, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds } from "./tiles.js";
+import { entitySpeed, isEntity, isEntityAnimated, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds, tileRotations } from "./tiles.js";
 import { tileWidth } from "./tilewidth.js";
 
 export let level = null;
@@ -296,6 +296,10 @@ function renderEntities() {
 			case 'wasp':
 			case 'rollingball':
 				drawSprite(entity.type, entity.x - 5, entity.y - 5);
+				break;
+			case 'plane':
+			case 'plane2':
+				drawRotatedSprite(entity.type, entity.x - 5, entity.y - 5, tileRotations[entity.direction]);
 				break;
 			case 'crab':
 			case 'pinkmonster':
@@ -614,6 +618,39 @@ export function tickLevel() {
 					}
 				}
 				break;
+			case 'plane':
+			case 'plane2':
+				const planeSpeed = entity.type === 'plane' ? 1 : 2;
+				switch (entity.direction) {
+					case 'up':
+						entity.y -= planeSpeed;
+						if (isSolid(level[Math.floor((entity.y - 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+							entity.direction = 'right';
+							entity.y = Math.ceil((entity.y - 5) / tileWidth) * tileWidth + 5;
+						}
+						break;
+					case 'right':
+						entity.x += planeSpeed;
+						if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + 5) / tileWidth)])) {
+							entity.direction = 'down';
+							entity.x = Math.floor((entity.x + 5) / tileWidth) * tileWidth - 5;
+						}
+						break;
+					case 'down':
+						entity.y += planeSpeed;
+						if (isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+							entity.direction = 'left';
+							entity.y = Math.floor((entity.y + 5) / tileWidth) * tileWidth - 5;
+						}
+						break;
+					case 'left':
+						entity.x -= planeSpeed;
+						if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x - 5) / tileWidth)])) {
+							entity.direction = 'up';
+							entity.x = Math.ceil((entity.x - 5) / tileWidth) * tileWidth + 5;
+						}
+						break;
+				}
 		}
 	}
 }

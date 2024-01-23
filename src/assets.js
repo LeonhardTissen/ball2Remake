@@ -55,3 +55,30 @@ export function drawSprite(spriteName, x, y, context = ctx) {
 		sprite.h,
 	);
 }
+
+export function drawRotatedSprite(spriteName, x, y, rot, context = ctx) {
+	const sprite = json[spriteName];
+
+	if (!sprite) {
+		throw new Error(`No sprite found with name ${spriteName}`);
+	}
+	
+	const rx = Math.floor(x);
+	const ry = Math.floor(y);
+
+	context.save();
+	context.translate(rx + sprite.w / 2, ry + sprite.h / 2);
+	context.rotate(rot);
+	context.drawImage(
+		img,
+		sprite.x,
+		sprite.y,
+		sprite.w,
+		sprite.h,
+		-sprite.w / 2,
+		-sprite.h / 2,
+		sprite.w,
+		sprite.h,
+	);
+	context.restore();
+}
