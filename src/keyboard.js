@@ -1,4 +1,4 @@
-import { exportLevel, toggleEditorMode, toggleTileMenu } from "./editor.js";
+import { exportLevel, toggleEditorMode, toggleTileMenu, uploadLevel } from "./editor.js";
 import { goToFirstLevel, goToNextLevel } from "./level.js";
 import { initLevelMenu, toggleLevelMenu } from "./levelmenu.js";
 
@@ -18,6 +18,8 @@ export function initKeyboard() {
 		} else if (e.key === '3') {
 			initLevelMenu();
 			toggleLevelMenu();
+		} else if (e.key === '4') {
+			uploadLevel();
 		} else if (e.key === 'm') {
 			goToNextLevel();
 		} else if (e.key === 'n') {
