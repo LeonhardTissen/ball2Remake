@@ -3,8 +3,8 @@ import json
 from PIL import Image
 
 # Final size of the sheet
-width = 100
-height = 100
+width = 160
+height = 160
 
 # Edit these folders to whatever you want
 input_folder = 'assets_src'
