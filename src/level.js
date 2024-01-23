@@ -7,6 +7,7 @@ import { isKeyDown } from "./keyboard.js";
 import { levels } from "./levels.js";
 import { buttonsHeld } from "./mouse.js";
 import { createExplosionParticles, renderExplosionParticles } from "./particle.js";
+import { isTemporaryBlockActive } from "./temporaryblock.js";
 import { addTextEntity, drawDigits } from "./text.js";
 import { advanceTick, tick } from "./tick.js";
 import { entitySpeed, isEntity, isEntityAnimated, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds, tileRotations } from "./tiles.js";
@@ -294,6 +295,11 @@ function renderTile(tileId, x, y, context, thumbnail) {
 		case nameToId.invisibleblock:
 			if (isTileInvisible(x, y) || editorMode || thumbnail) {
 				drawSprite('invisibleblock', x * tileWidth, y * tileWidth, context);
+			}
+			break;
+		case nameToId.temporaryblock:
+			if (isTemporaryBlockActive(x, y) || editorMode || thumbnail) {
+				drawSprite('temporaryblock', x * tileWidth, y * tileWidth, context);
 			}
 			break;
 		default:

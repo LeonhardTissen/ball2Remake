@@ -2,6 +2,7 @@ import { sound } from "./audio.js";
 import { addInvisibleTile } from "./invisible.js";
 import { level } from "./level.js";
 import { createExplosionParticles } from "./particle.js";
+import { isTemporaryBlockActive } from "./temporaryblock.js";
 import { tileWidth } from "./tilewidth.js";
 
 export const tileIds = {
@@ -99,7 +100,10 @@ export function isSolid(tileId, playerCaused = false, bulletPower = false, tileX
 			sound.play('TI');
 		} else if (tileId === nameToId.invisibleblock) {
 			addInvisibleTile(tileX, tileY);
+		} else if (tileId === nameToId.temporaryblock) {
+			return isTemporaryBlockActive(tileX, tileY);
 		}
+		
 	}
 	if (bulletPower && tileId === nameToId.explodableblock) {
 		level[tileY][tileX] = nameToId.air;
