@@ -100,10 +100,10 @@ export function isSolid(tileId, playerCaused = false, bulletPower = false, tileX
 			sound.play('TI');
 		} else if (tileId === nameToId.invisibleblock) {
 			addInvisibleTile(tileX, tileY);
-		} else if (tileId === nameToId.temporaryblock) {
-			return isTemporaryBlockActive(tileX, tileY);
 		}
-		
+	}
+	if (tileId === nameToId.temporaryblock) {
+		return isTemporaryBlockActive(tileX, tileY);
 	}
 	if (bulletPower) {
 		if (tileId === nameToId.explodableblock || tileId === nameToId.explodableblockbomb) {

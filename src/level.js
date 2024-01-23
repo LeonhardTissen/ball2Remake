@@ -752,7 +752,9 @@ export function tickLevel() {
 				const verticalSpeed = entitySpeed[entity.type];
 				entity.y += entity.down ? -verticalSpeed : verticalSpeed;
 				entity.yTransferMomentum = (entity.down ? -1.5 : 1.5);
-				if (isSolid(level[Math.floor((entity.y + (entity.down ? -5 : 5)) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+				const tileX = Math.floor(entity.x / tileWidth);
+				const tileY = Math.floor((entity.y + (entity.down ? -5 : 5)) / tileWidth);
+				if (isSolid(level[tileY][tileX], false, false, tileX, tileY)) {
 					entity.down = !entity.down;
 				}
 
