@@ -65,7 +65,9 @@ export function goToNextLevel() {
 	const levelNum = parseInt(currentLevel.replace('level', ''));
 	const nextLevelNum = levelNum + 1;
 	const nextLevelId = `level${nextLevelNum}`;
-	loadLevel(levels[nextLevelId] ? nextLevelId : '404');
+	if (levels[nextLevelId]) {
+		loadLevel(nextLevelId);
+	}
 }
 
 export function goToFirstLevel() {
