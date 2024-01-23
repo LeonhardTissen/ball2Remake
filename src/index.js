@@ -12,7 +12,7 @@ const ticksPerSecond = 30;
 
 loadAssets().then(() => {
 	initKeyboard();
-	loadLevel('test3');
+	loadLevel('test4');
 	loop();
 	setInterval(tickLevel, 1000 / ticksPerSecond);
 });

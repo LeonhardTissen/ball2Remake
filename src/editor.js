@@ -1,3 +1,4 @@
+import { apiURL } from "./api.js";
 import { drawSprite } from "./assets.js";
 import { ctx, cvs } from "./canvas.js";
 import { currentLevel, restartLevel } from "./level.js";
@@ -61,8 +62,6 @@ export function uploadLevel() {
 		alert('Level name must be 10 characters or less.');
 		return;
 	}
-
-	const apiURL = 'https://warze.org/ball2';
 
 	// Submit form to API
 	const form = new FormData();
