@@ -1,8 +1,3 @@
-import { toggleUploadMenu } from "./api.js";
-import { exportLevel, toggleEditorMode, toggleTileMenu } from "./editor.js";
-import { goToFirstLevel, goToNextLevel } from "./level.js";
-import { initLevelMenu, toggleLevelMenu } from "./levelmenu.js";
-
 export const keysHeld = new Set();
 
 export function initKeyboard() {

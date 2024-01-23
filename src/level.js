@@ -74,10 +74,6 @@ export function goToNextLevel() {
 	}
 }
 
-export function goToFirstLevel() {
-	loadLevel('level3');
-}
-
 export function goToLevel(levelId) {
 	loadLevel(levelId);
 }
