@@ -161,6 +161,7 @@ export function isEntity(tileId) {
 		'wave',
 		'crusher',
 		'rollingball',
+		'laser',
 	].includes(tileIds[tileId]);
 }
 

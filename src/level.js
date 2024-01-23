@@ -178,6 +178,13 @@ export function loadLevel(levelId) {
 						left: true,
 					});
 					break;
+				case nameToId.laser:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+					});
+					break;
 			}
 
 			if (isEntity(testLevel[y][x])) {
@@ -287,16 +294,6 @@ function renderEntities() {
 					drawSprite('player', entity.x - 2, entity.y - 2);
 				}
 				break;
-			case 'horizontalmovingplatform1':
-			case 'horizontalmovingplatform2':
-			case 'elevator1':
-			case 'elevator2':
-			case 'lightning':
-			case 'crusher':
-			case 'wasp':
-			case 'rollingball':
-				drawSprite(entity.type, entity.x - 5, entity.y - 5);
-				break;
 			case 'plane':
 			case 'plane2':
 				drawRotatedSprite(entity.type, entity.x - 5, entity.y - 5, tileRotations[entity.direction]);
@@ -307,6 +304,7 @@ function renderEntities() {
 			case 'jellyfish':
 			case 'wave':
 			case 'redmonster':
+			case 'laserfire':
 				drawSprite(`${entity.type}${Math.floor(tick * 0.5) % 2 + 1}`, entity.x - 5, entity.y - 5);
 				break;
 			case 'spring':
@@ -314,6 +312,9 @@ function renderEntities() {
 					entity.springTimer--;
 				}
 				drawSprite(`spring${entity.springTimer > 0 ? 2 : 1}`, entity.x - 5, entity.y - 5);
+				break;
+			default:
+				drawSprite(entity.type, entity.x - 5, entity.y - 5);
 				break;
 		}
 	}
@@ -326,6 +327,7 @@ export function tickLevel() {
 
 	if (editorMode) return;
 
+	let playerEntity = null;
 	for (const entity of entities) {
 		switch (entity.type) {
 			case 'player':
@@ -557,7 +559,7 @@ export function tickLevel() {
 				break;
 			case 'crusher':
 				// Check if player below
-				const playerEntity = entities.find(e => e.type === 'player');
+				playerEntity = entities.find(e => e.type === 'player');
 				if (
 					playerEntity.x > entity.x - 5 &&
 					playerEntity.x < entity.x + 5 &&
@@ -621,6 +623,7 @@ export function tickLevel() {
 			case 'plane':
 			case 'plane2':
 				const planeSpeed = entity.type === 'plane' ? 1 : 2;
+				// Rotate clockwise when hitting a wall
 				switch (entity.direction) {
 					case 'up':
 						entity.y -= planeSpeed;
@@ -651,6 +654,53 @@ export function tickLevel() {
 						}
 						break;
 				}
+			case 'laser':
+				// Check if player is to the right of the laser
+				playerEntity = entities.find(e => e.type === 'player');
+
+				if (deathTimer > 0) {
+
+				} else {
+					if (playerEntity.x > entity.x && playerEntity.y > entity.y - 5 && playerEntity.y < entity.y + 5) {
+						// Recursively check if laser can reach player (Check for any solid walls in the way)
+						const playerTileX = Math.floor(playerEntity.x / tileWidth);
+						const laserTileX = Math.floor(entity.x / tileWidth);
+						const laserTileY = Math.floor(entity.y / tileWidth);
+						let x = laserTileX;
+						let y = laserTileY;
+
+						const laserTiles = [];
+
+						let laserCanReachPlayer = false;
+						let hitWall = false;
+						while (!hitWall) {
+							x++;
+							if (isSolid(level[y][x])) {
+								hitWall = true;
+								break;
+							}
+							laserTiles.push({ x, y });
+							if (playerTileX === x) {
+								laserCanReachPlayer = true;
+							}
+						}
+
+						if (laserCanReachPlayer) {
+							sound.play('KICK');
+							deathTimer = deathTimerLength;
+							
+							// Spawn entities on the way
+							laserTiles.forEach(({ x, y }) => {
+								entities.push({
+									type: 'laserfire',
+									x: x * tileWidth + tileWidth / 2,
+									y: y * tileWidth + tileWidth / 2,
+								});
+							})
+						}
+					}
+				}
+				break;
 		}
 	}
 }
