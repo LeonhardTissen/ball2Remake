@@ -350,20 +350,12 @@ function renderEntities() {
 		switch (entity.type) {
 			case 'player':
 				if (deathTimer > 0) {
-					deathTimer -= 0.2;
 					const deathAnimFrame = Math.floor(deathTimerLength - deathTimer);
 					if (deathAnimFrame <= 3 && deathAnimFrame >= 1) {
 						drawSprite(`playerdie${deathAnimFrame}`, entity.x - 5, entity.y - 5);
 					}
-					if (deathTimer <= 0) {
-						restartLevel();
-					}
 				} else if (winTimer > 0) {
-					winTimer -= 0.2;
 					drawSprite('player', entity.x - 2, entity.y - 2);
-					if (winTimer <= 0) {
-						goToNextLevel();
-					}
 				} else if (starTimer > 10) {
 					drawSprite('playerinvincible', entity.x - 2, entity.y - 2);
 				} else {
@@ -413,6 +405,20 @@ export function tickLevel() {
 	for (const entity of entities) {
 		switch (entity.type) {
 			case 'player':
+				if (deathTimer > 0) {
+					deathTimer-=0.5;
+					if (deathTimer === 0) {
+						restartLevel();
+						break;
+					}
+				}
+				if (winTimer > 0) {
+					winTimer-=0.5;
+					if (winTimer === 0) {
+						goToNextLevel();
+						break;
+					}
+				}
 				if (deathTimer > 0 || winTimer > 0) break;
 				entity.x += entity.xvel;
 				entity.y += entity.yvel;
