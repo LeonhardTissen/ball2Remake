@@ -591,21 +591,21 @@ export function tickLevel() {
 						entity.xvel = -boosterHorizontalSpeed;
 						break;
 					case nameToId.portalhorizontal:
-						if (entity.portalFatigue) break;
+						if (entity.portalFatigue === 'horizontal') break;
 						const portalX = portals.horizonal[playerTileY].find(x => x !== playerTileX);
 						if (portalX) {
 							entity.x = portalX * tileWidth + tileWidth / 2;
 							entity.y = playerTileY * tileWidth + tileWidth / 2;
-							entity.portalFatigue = true;
+							entity.portalFatigue = 'horizontal';
 						}
 						break;
 					case nameToId.portalvertical:
-						if (entity.portalFatigue) break;
+						if (entity.portalFatigue === 'vertical') break;
 						const portalY = portals.vertical[playerTileX].find(y => y !== playerTileY);
 						if (portalY) {
 							entity.x = playerTileX * tileWidth + tileWidth / 2;
 							entity.y = portalY * tileWidth + tileWidth / 2;
-							entity.portalFatigue = true;
+							entity.portalFatigue = 'vertical';
 						}
 						break;
 					case nameToId.gun:
@@ -743,21 +743,21 @@ export function tickLevel() {
 						entity.portalFatigue = false;
 						break;
 					case nameToId.portalhorizontal:
-						if (entity.portalFatigue) break;
+						if (entity.portalFatigue === 'horizontal') break;
 						const portalX = portals.horizonal[ballTileY].find(x => x !== ballTileX);
 						if (portalX) {
 							entity.x = portalX * tileWidth + tileWidth / 2;
 							entity.y = ballTileY * tileWidth + tileWidth / 2;
-							entity.portalFatigue = true;
+							entity.portalFatigue = 'horizontal';
 						}
 						break;
 					case nameToId.portalvertical:
-						if (entity.portalFatigue) break;
+						if (entity.portalFatigue === 'vertical') break;
 						const portalY = portals.vertical[ballTileX].find(y => y !== ballTileY);
 						if (portalY) {
 							entity.x = ballTileX * tileWidth + tileWidth / 2;
 							entity.y = portalY * tileWidth + tileWidth / 2;
-							entity.portalFatigue = true;
+							entity.portalFatigue = 'vertical';
 						}
 						break;
 				}
