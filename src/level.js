@@ -103,6 +103,10 @@ export function loadLevel(levelId) {
 	timeouts = [];
 	clearParticles();
 	clearInvensibleTiles();
+	deathTimer = 0;
+	winTimer = 0;
+	starTimer = 0;
+	stunTimer = 0;
 
 	for (let y = 0; y < testLevel.length; y++) {
 		for (let x = 0; x < testLevel[y].length; x++) {
