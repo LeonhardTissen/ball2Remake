@@ -1,0 +1,16 @@
+I am happy to announce that I've released a new game! 📣
+
+Ball 2 Remake is a pixel perfect recreation of a really old computer game from my childhood (Released ~2000).
+
+It was nearly impossible to find, but with the help of a friend and the WaybackMachine, I got hold of the original .exe file.
+
+I took it upon myself to rewrite the game in JavaScript to allow more people to play it and for me to be able to add things to it.
+
+So in less than 3 days, I created:
+- A 1:1 recreation of the platformer 👾
+- A level editor with the ability to upload and share levels ⚒️
+- A smoother experience than the original provided 🫠
+
+Go play the 30+ levels, but be warned... it's quite difficult 😉
+
+https://ball2.warze.org
