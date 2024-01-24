@@ -957,8 +957,9 @@ export function tickLevel() {
 						const tileX = Math.floor((entity.x + x * tileWidth) / tileWidth);
 						const tileY = Math.floor((entity.y + y * tileWidth) / tileWidth);
 						if (
-							level[tileY][tileX] === nameToId.explodableblock ||
-							level[tileY][tileX] === nameToId.explodableblockbomb
+							level[tileY] &&
+							(level[tileY][tileX] === nameToId.explodableblock ||
+							level[tileY][tileX] === nameToId.explodableblockbomb)
 						) {
 							if (level[tileY][tileX] === nameToId.explodableblockbomb) {
 								// Spawn another bomb
