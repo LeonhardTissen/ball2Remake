@@ -4,6 +4,7 @@ import { ctx, cvs } from "./canvas.js";
 import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, setCurrentEditorTile } from "./editor.js";
 import { clearInvensibleTiles, isTileInvisible } from "./invisible.js";
 import { isKeyDown } from "./keyboard.js";
+import { addKey, resetKeys } from "./keys.js";
 import { levels } from "./levels.js";
 import { setNewHighestLevel } from "./localstorage.js";
 import { buttonsHeld } from "./mouse.js";
@@ -43,6 +44,8 @@ const starTimerLength = 150;
 const fullJumpVelocity = -5.7;
 const smallJumpVelocity = -1.9;
 const springVelocity = 8.2;
+
+const sunShootTimerLength = 40;
 
 const gunCooldown = 8;
 let timeouts = [];
@@ -107,6 +110,7 @@ export function loadLevel(levelId) {
 	winTimer = 0;
 	starTimer = 0;
 	stunTimer = 0;
+	resetKeys();
 
 	for (let y = 0; y < testLevel.length; y++) {
 		for (let x = 0; x < testLevel[y].length; x++) {
@@ -175,6 +179,7 @@ export function loadLevel(levelId) {
 					break;
 				case nameToId.plane:
 				case nameToId.plane2:
+				case nameToId.eye:
 					entities.push({
 						type: spriteName,
 						x: x * tileWidth + tileWidth / 2,
@@ -249,6 +254,14 @@ export function loadLevel(levelId) {
 						y: y * tileWidth + tileWidth / 2,
 						originX: x * tileWidth + tileWidth / 2,
 						originY: y * tileWidth + tileWidth / 2,
+					});
+					break;
+				case nameToId.sun:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						shootTimer: 0,
 					});
 					break;
 			}
@@ -545,6 +558,11 @@ export function tickLevel() {
 						sound.play('CRII');
 						starTimer = starTimerLength;
 						level[playerTileY][playerTileX] = nameToId.air;
+						break;
+					case nameToId.key:
+						sound.play('ITM');
+						level[playerTileY][playerTileX] = nameToId.air;
+						addKey();
 						break;
 					case nameToId.spike:
 						if (starTimer > 0) {
@@ -852,7 +870,8 @@ export function tickLevel() {
 				break;
 			case 'plane':
 			case 'plane2':
-				const planeSpeed = entity.type === 'plane' ? 1 : 2;
+			case 'eye':
+				const planeSpeed = entity.type === 'plane2' ? 2 : 1;
 				// Rotate clockwise when hitting a wall
 				switch (entity.direction) {
 					case 'up':
@@ -984,6 +1003,39 @@ export function tickLevel() {
 				if (entity.age > 8) {
 					// Destroy bomb
 					entities.splice(entities.indexOf(entity), 1);
+				}
+				break;
+			case 'sun':
+				entity.shootTimer++;
+				if (entity.shootTimer === sunShootTimerLength) {
+					// Shoot bullet at player
+					playerEntity = entities.find(e => e.type === 'player');
+					const dx = playerEntity.x - entity.x;
+					const dy = playerEntity.y - entity.y;
+					const angle = Math.atan2(dy, dx);
+					const xVel = Math.cos(angle) * 2;
+					const yVel = Math.sin(angle) * 2;
+					entities.push({
+						type: 'sunbullet',
+						x: entity.x,
+						y: entity.y,
+						xVel,
+						yVel,
+					});
+					entity.shootTimer = 0;
+				}
+				break;
+			case 'sunbullet':
+				entity.x += entity.xVel;
+				entity.y += entity.yVel;
+
+				// Kill player if collide
+				if (deathTimer > 0) break;
+
+				playerEntity = entities.find(e => e.type === 'player');
+				if (Math.abs(entity.x - playerEntity.x) < 3 && Math.abs(entity.y - playerEntity.y) < 3) {
+					sound.play('KICK');
+					deathTimer = deathTimerLength;
 				}
 				break;
 		}

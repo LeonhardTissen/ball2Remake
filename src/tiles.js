@@ -1,5 +1,6 @@
 import { sound } from "./audio.js";
 import { addInvisibleTile } from "./invisible.js";
+import { hasKey, removeKey } from "./keys.js";
 import { entities, level } from "./level.js";
 import { createExplosionParticles } from "./particle.js";
 import { isTemporaryBlockActive } from "./temporaryblock.js";
@@ -24,6 +25,8 @@ export const tileIds = {
 	15: 'portalvertical',
 	16: 'portalhorizontal',
 	17: 'earthquaketoken',
+	18: 'key',
+	19: 'keyblock',
 	20: 'grayblock',
 	21: 'greenbricks',
 	22: 'explodableblock',
@@ -85,6 +88,8 @@ export const tileIds = {
 	81: 'laser',
 	82: 'plane2',
 	83: 'lightning',
+	84: 'sun',
+	85: 'eye',
 }
 
 export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
@@ -120,6 +125,15 @@ export function isSolid(tileId, playerCaused = false, bulletPower = false, tileX
 			createExplosionParticles('explodableblock', tileX * tileWidth, tileY * tileWidth);
 			sound.play('BRE');
 		}
+	}
+	if (tileId === nameToId.keyblock) {
+		if (hasKey()) {
+			removeKey();
+			level[tileY][tileX] = nameToId.air;
+			sound.play('TI');
+			return false;
+		}
+		return true;
 	}
 	return [
 		'grayblock',
@@ -189,6 +203,8 @@ export function isEntity(tileId) {
 		'laser',
 		'spinningplatform',
 		'peaplatform',
+		'sun',
+		'eye',
 	].includes(tileIds[tileId]);
 }
 
@@ -200,6 +216,7 @@ export function isEntityPlatform(tileId) {
 		'elevator2',
 		'spinningplatform',
 		'peaplatform',
+		'eye',
 	].includes(tileIds[tileId]);
 }
 
@@ -217,6 +234,7 @@ export function isEntityEnemy(tileId) {
 		'redmonster',
 		'wave',
 		'crusher',
+		'sun',
 	].includes(tileIds[tileId]);
 }
 
