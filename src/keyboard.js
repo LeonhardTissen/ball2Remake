@@ -1,8 +1,14 @@
+import { restartLevel } from "./level.js";
+
 export const keysHeld = new Set();
 
 export function initKeyboard() {
 	document.addEventListener('keydown', (e) => {
 		keysHeld.add(e.key);
+
+		if (e.key === 'r') {
+			restartLevel();
+		}
 	});
 
 	document.addEventListener('keyup', (e) => {

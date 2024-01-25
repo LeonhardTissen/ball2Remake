@@ -261,6 +261,14 @@ export function loadLevel(levelId) {
 						shootTimer: 0,
 					});
 					break;
+				case nameToId.sensor:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						active: false,
+					});
+					break;
 			}
 
 			if (isEntity(testLevel[y][x])) {
@@ -397,6 +405,8 @@ function renderEntities() {
 			case 'explodingbomb':
 				drawSprite(`explodingbomb${Math.floor(entity.age)}`, entity.x - 10, entity.y - 10);
 				break;
+			case 'sensor':
+				drawSprite(`sensor${entity.active ? 'active' : ''}`, entity.x - 5, entity.y - 5);
 			default:
 				drawSprite(entity.type, entity.x - 5, entity.y - 5);
 				break;
@@ -1033,6 +1043,20 @@ export function tickLevel() {
 				if (Math.abs(entity.x - playerEntity.x) < 3 && Math.abs(entity.y - playerEntity.y) < 3) {
 					sound.play('KICK');
 					deathTimer = deathTimerLength;
+				}
+				break;
+			case 'sensor':
+				// Check if collide with player
+				playerEntity = entities.find(e => e.type === 'player');
+				if (Math.abs(entity.x - playerEntity.x) < 5 && Math.abs(entity.y - playerEntity.y) < 5) {
+					entity.active = true;
+				} else if (entity.active) {
+					// Delete self and place tile
+					const tileX = Math.floor(entity.x / tileWidth);
+					const tileY = Math.floor(entity.y / tileWidth);
+					level[tileY][tileX] = nameToId.orangeblock;
+					entities.splice(entities.indexOf(entity), 1);
+					sound.play('Bom');
 				}
 				break;
 		}
