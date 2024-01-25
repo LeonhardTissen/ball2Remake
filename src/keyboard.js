@@ -14,6 +14,18 @@ export function isKeyDown(key) {
 	return keysHeld.has(key);
 }
 
+export function isGoingLeft() {
+	return isKeyDown('ArrowLeft') || isKeyDown('a');
+}
+
+export function isGoingRight() {
+	return isKeyDown('ArrowRight') || isKeyDown('d');
+}
+
+export function isHoldingSpace() {
+	return isKeyDown(' ') || isKeyDown('ArrowDown') || isKeyDown('s');
+}
+
 if ('ontouchstart' in document.documentElement) {
 	const touchEvents = {
 		'left': 'ArrowLeft',

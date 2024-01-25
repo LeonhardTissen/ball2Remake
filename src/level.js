@@ -3,7 +3,7 @@ import { sound } from "./audio.js";
 import { ctx, cvs } from "./canvas.js";
 import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, setCurrentEditorTile } from "./editor.js";
 import { clearInvensibleTiles, isTileInvisible } from "./invisible.js";
-import { isKeyDown } from "./keyboard.js";
+import { isGoingLeft, isGoingRight, isHoldingSpace } from "./keyboard.js";
 import { addKey, resetKeys } from "./keys.js";
 import { levels } from "./levels.js";
 import { setNewHighestLevel } from "./localstorage.js";
@@ -11,7 +11,7 @@ import { buttonsHeld } from "./mouse.js";
 import { clearParticles, createExplosionParticles, renderExplosionParticles } from "./particle.js";
 import { isTemporaryBlockActive } from "./temporaryblock.js";
 import { addTextEntity, drawDigits } from "./text.js";
-import { advanceTick, tick } from "./tick.js";
+import { advanceTick, resetTick, tick } from "./tick.js";
 import { entitySpeed, isEntity, isEntityAnimated, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds, tileRotations } from "./tiles.js";
 import { tileWidth } from "./tilewidth.js";
 
@@ -111,6 +111,7 @@ export function loadLevel(levelId) {
 	starTimer = 0;
 	stunTimer = 0;
 	resetKeys();
+	resetTick();
 
 	for (let y = 0; y < testLevel.length; y++) {
 		for (let x = 0; x < testLevel[y].length; x++) {
@@ -449,11 +450,11 @@ export function tickLevel() {
 				}
 
 				if (stunTimer === 0) {
-					if (isKeyDown('ArrowLeft')) {
+					if (isGoingLeft()) {
 						if (entity.xvel > -horizontalPlayerSpeed) {
 							entity.xvel = -horizontalPlayerSpeed;
 						}
-					} else if (isKeyDown('ArrowRight')) {
+					} else if (isGoingRight()) {
 						if (entity.xvel < horizontalPlayerSpeed) {
 							entity.xvel = horizontalPlayerSpeed;
 						}
@@ -500,7 +501,7 @@ export function tickLevel() {
 						entity.y = Math.floor((entity.y) / tileWidth) * tileWidth - 2;
 	
 						// Lower jump if holding space
-						entity.yvel = isKeyDown(' ') ? smallJumpVelocity : fullJumpVelocity;
+						entity.yvel = isHoldingSpace() ? smallJumpVelocity : fullJumpVelocity;
 					}
 				} else {
 					// Collision detection for ceiling while jumping
@@ -694,7 +695,7 @@ export function tickLevel() {
 				for (const otherEntity of entities) {
 					if (isEntityPlatform(nameToId[otherEntity.type])) {
 						if (Math.abs(entity.x - otherEntity.x) < 7 && Math.abs(entity.y - otherEntity.y) < 7) {
-							entity.yvel = isKeyDown(' ') ? smallJumpVelocity : fullJumpVelocity + (otherEntity.yTransferMomentum || 0);
+							entity.yvel = isHoldingSpace() ? smallJumpVelocity : fullJumpVelocity + (otherEntity.yTransferMomentum || 0);
 						}
 					} else if (isEntityEnemy(nameToId[otherEntity.type])) {
 						if (starTimer > 0) {
