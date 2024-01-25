@@ -99,7 +99,7 @@ export function loadLevel(levelId) {
 	diamondsLeft = 0;
 	score = 0;
 	portals = {
-		horizonal: {},
+		horizontal: {},
 		vertical: {},
 	};
 	timeouts.forEach(clearTimeout);
@@ -122,18 +122,14 @@ export function loadLevel(levelId) {
 					diamondsLeft++;
 					break;
 				case nameToId.portalhorizontal:
-					if (!portals.horizonal[y]) {
-						portals.horizonal[y] = [x];
-					} else {
-						portals.horizonal[y].push(x);
-					}
-					break;
 				case nameToId.portalvertical:
-					if (!portals.vertical[x]) {
-						portals.vertical[x] = [y];
+					const portalType = tileId === nameToId.portalhorizontal ? 'horizontal' : 'vertical';
+					if (!portals[portalType][x]) {
+						portals[portalType][x] = [];
 					} else {
-						portals.vertical[x].push(y);
+						portals[portalType][x].push(y);
 					}
+
 					break;
 				case nameToId.player:
 					entities.push({
@@ -611,7 +607,7 @@ export function tickLevel() {
 						break;
 					case nameToId.portalhorizontal:
 						if (entity.portalFatigue === 'horizontal') break;
-						const portalX = portals.horizonal[playerTileY].find(x => x !== playerTileX);
+						const portalX = portals.horizontal[playerTileY].find(x => x !== playerTileX);
 						if (portalX) {
 							entity.x = portalX * tileWidth + tileWidth / 2;
 							entity.y = playerTileY * tileWidth + tileWidth / 2;
@@ -763,7 +759,7 @@ export function tickLevel() {
 						break;
 					case nameToId.portalhorizontal:
 						if (entity.portalFatigue === 'horizontal') break;
-						const portalX = portals.horizonal[ballTileY].find(x => x !== ballTileX);
+						const portalX = portals.horizontal[ballTileY].find(x => x !== ballTileX);
 						if (portalX) {
 							entity.x = portalX * tileWidth + tileWidth / 2;
 							entity.y = ballTileY * tileWidth + tileWidth / 2;
