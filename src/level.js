@@ -269,6 +269,14 @@ export function loadLevel(levelId) {
 						active: false,
 					});
 					break;
+				case nameToId.jumper:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						yVel: 0,
+					});
+					break;
 			}
 
 			if (isEntity(testLevel[y][x])) {
@@ -407,6 +415,10 @@ function renderEntities() {
 				break;
 			case 'sensor':
 				drawSprite(`sensor${entity.active ? 'active' : ''}`, entity.x - 5, entity.y - 5);
+				break;
+			case 'jumper':
+				drawSprite(`jumper${entity.yVel !== 0 ? '2' : ''}`, entity.x - 5, entity.y - 5);
+				break;
 			default:
 				drawSprite(entity.type, entity.x - 5, entity.y - 5);
 				break;
@@ -1057,6 +1069,26 @@ export function tickLevel() {
 					level[tileY][tileX] = nameToId.orangeblock;
 					entities.splice(entities.indexOf(entity), 1);
 					sound.play('Bom');
+				}
+				break;
+			case 'jumper':
+				entity.yVel += 0.33;
+				entity.y += entity.yVel;
+				if (entity.yVel > 0) {
+					// Floor collision
+					if (isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+						entity.y = Math.floor((entity.y + 5) / tileWidth) * tileWidth - 5;
+						entity.yVel = 0;
+					}
+				} else {
+					// Ceiling collision
+					if (isSolid(level[Math.floor((entity.y - 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+						entity.y = Math.ceil((entity.y - 5) / tileWidth) * tileWidth + 5;
+						entity.yVel = 0;
+					}
+				}
+				if (entity.yVel === 0 && tick % 40 === 0) {
+					entity.yVel = -4.5;
 				}
 				break;
 		}

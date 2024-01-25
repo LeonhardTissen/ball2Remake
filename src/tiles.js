@@ -91,6 +91,7 @@ export const tileIds = {
 	84: 'sun',
 	85: 'eye',
 	86: 'sensor',
+	87: 'jumper',
 }
 
 export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
@@ -207,6 +208,7 @@ export function isEntity(tileId) {
 		'sun',
 		'eye',
 		'sensor',
+		'jumper',
 	].includes(tileIds[tileId]);
 }
 
@@ -237,6 +239,7 @@ export function isEntityEnemy(tileId) {
 		'wave',
 		'crusher',
 		'sun',
+		'jumper',
 	].includes(tileIds[tileId]);
 }
 
