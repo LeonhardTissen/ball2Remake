@@ -35,8 +35,8 @@ export function renderExplosionParticles() {
 		// Draw the particle to the buffer
 		drawSprite(assetName, 0, 0, pctx);
 
-		const f = Math.round((1 - age / 50) * s); // Final size
-		const o = age * 0.25; // Offset
+		const f = Math.round((1 - age / 24) * s); // Final size
+		const o = age; // Offset
 
 		// Draw the four corners of the particle
 		ctx.drawImage(particleBuffer, 0, 0, s, s, Math.round(x - o), Math.round(y - o), f, f);
@@ -44,7 +44,7 @@ export function renderExplosionParticles() {
 		ctx.drawImage(particleBuffer, 0, 5, s, s, Math.round(x - o), Math.round(y + o) + 5, f, f);
 		ctx.drawImage(particleBuffer, 5, 5, s, s, Math.round(x + o) + 5, Math.round(y + o) + 5, f, f);
 
-		if (age > 50) {
+		if (age > 24) {
 			explosionParticles.splice(explosionParticles.indexOf(particle), 1);
 		}
 	}

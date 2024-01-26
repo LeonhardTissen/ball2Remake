@@ -10,7 +10,7 @@ import { setNewHighestLevel } from "./localstorage.js";
 import { buttonsHeld } from "./mouse.js";
 import { clearParticles, createExplosionParticles, renderExplosionParticles } from "./particle.js";
 import { isTemporaryBlockActive } from "./temporaryblock.js";
-import { addTextEntity, drawDigits } from "./text.js";
+import { addTextEntity, drawDigits, renderTextEntities } from "./text.js";
 import { advanceTick, resetTick, tick } from "./tick.js";
 import { entitySpeed, isEntity, isEntityAnimated, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds, tileRotations } from "./tiles.js";
 import { tileWidth } from "./tilewidth.js";
@@ -1169,4 +1169,7 @@ export function tickLevel() {
 				break;
 		}
 	}
+
+	renderLevel(ctx);
+	renderTextEntities();
 }

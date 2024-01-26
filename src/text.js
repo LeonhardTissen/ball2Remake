@@ -50,10 +50,10 @@ export function renderTextEntities() {
 		const entity = textEntities[i];
 		
 		entity.age++;
-		entity.y -= 0.2;
+		entity.y -= 0.5;
 		drawDigits(entity.text, entity.x, entity.y, true);
 
-		if (entity.age > 60) {
+		if (entity.age > 20) {
 			textEntities.splice(textEntities.indexOf(entity), 1);
 			i --;
 		}
