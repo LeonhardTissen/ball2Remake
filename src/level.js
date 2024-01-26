@@ -330,8 +330,6 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 		renderTiles(context, levelRender, thumbnail);
 	}
 
-	if (thumbnail) return;
-
 	if (editorMode) {
 		renderEditor();
 
@@ -451,11 +449,7 @@ function renderEntities() {
 
 const horizontalPlayerSpeed = 2;
 
-export function tickLevel() {
-	advanceTick();
-
-	if (editorMode) return;
-
+function tickEntities() {
 	let playerEntity = null;
 	for (let i = 0; i < entities.length; i++) {
 		const entity = entities[i];
@@ -1174,7 +1168,20 @@ export function tickLevel() {
 				break;
 		}
 	}
+}
 
+
+export function tickLevel() {
+	advanceTick();
+
+	if (!editorMode) {
+		tickEntities();
+	};
+
+	
 	renderLevel(ctx);
-	renderTextEntities();
+
+	if (!editorMode) {
+		renderTextEntities();
+	}
 }
