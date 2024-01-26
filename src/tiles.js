@@ -187,6 +187,10 @@ export function isSolid(tileId, playerCaused = false, bulletPower = false, tileX
 		'mushroomblock',
 		'waterblock',
 		'purplechainblock',
+		'breakableblock1',
+		'breakableblock2',
+		'breakableblock3',
+		'invisibleblock',
 	].includes(tileIds[tileId]);
 }
 
