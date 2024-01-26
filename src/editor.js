@@ -1,6 +1,7 @@
 import { drawSprite } from "./assets.js";
 import { ctx, cvs } from "./canvas.js";
 import { currentLevel, restartLevel } from "./level.js";
+import { hideLevelMenu } from "./levelmenu.js";
 import { levels } from "./levels.js";
 import { buttonsHeld } from "./mouse.js";
 import { tick } from "./tick.js";
@@ -21,6 +22,9 @@ export function toggleEditorMode() {
 	editorMode = !editorMode;
 	setButtonVisibility(editorMode);
 	restartLevel();
+	if (editorMode) {
+		hideLevelMenu();
+	}
 }
 
 export function toggleTileMenu() {

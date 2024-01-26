@@ -59,3 +59,7 @@ function createLevelButton(levelName, level, categoryElem, author = undefined) {
 export function toggleLevelMenu() {
 	levelElem.classList.toggle('hidden');
 }
+
+export function hideLevelMenu() {
+	levelElem.classList.add('hidden');
+}
