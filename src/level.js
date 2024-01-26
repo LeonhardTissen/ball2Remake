@@ -444,7 +444,8 @@ export function tickLevel() {
 	if (editorMode) return;
 
 	let playerEntity = null;
-	for (const entity of entities) {
+	for (let i = 0; i < entities.length; i++) {
+		const entity = entities[i];
 		let tileX, tileY, tileX1, tileX2;
 		switch (entity.type) {
 			case 'player':
@@ -733,6 +734,7 @@ export function tickLevel() {
 							if (Math.abs(entity.x - otherEntity.x) < 5 && Math.abs(entity.y - otherEntity.y) < 5) {
 								sound.play('DIE');
 								entities.splice(entities.indexOf(otherEntity), 1);
+								i --;
 								const explosionSprite = isEntityAnimated(nameToId[otherEntity.type]) ? `${otherEntity.type}1` : otherEntity.type;
 								createExplosionParticles(explosionSprite, otherEntity.x - 5, otherEntity.y - 5);
 							}
@@ -799,6 +801,7 @@ export function tickLevel() {
 				// Delete ball if it falls off the map
 				if (!level[ballTileY]) {
 					entities.splice(entities.indexOf(entity), 1);
+					i --;
 					break;
 				}
 				switch (level[ballTileY][ballTileX]) {
@@ -1021,6 +1024,7 @@ export function tickLevel() {
 				// Kill bullet if collide with solid tile
 				if (isSolid(bulletTileX, bulletTileY, true, true)) {
 					entities.splice(entities.indexOf(entity), 1);
+					i --;
 				}
 				// Kill enemy if collide
 				for (const otherEntity of entities) {
@@ -1029,6 +1033,7 @@ export function tickLevel() {
 							sound.play('DIE');
 							entities.splice(entities.indexOf(otherEntity), 1);
 							entities.splice(entities.indexOf(entity), 1);
+							i --;
 							const explosionSprite = isEntityAnimated(nameToId[otherEntity.type]) ? `${otherEntity.type}1` : otherEntity.type;
 							createExplosionParticles(explosionSprite, otherEntity.x - 5, otherEntity.y - 5);
 						}
@@ -1068,6 +1073,7 @@ export function tickLevel() {
 				if (entity.age > 8) {
 					// Destroy bomb
 					entities.splice(entities.indexOf(entity), 1);
+					i --;
 				}
 				break;
 			case 'sun':
@@ -1114,6 +1120,7 @@ export function tickLevel() {
 					const tileY = Math.floor(entity.y / tileWidth);
 					level[tileY][tileX] = nameToId.orangeblock;
 					entities.splice(entities.indexOf(entity), 1);
+					i --;
 					sound.play('Bom');
 				}
 				break;
