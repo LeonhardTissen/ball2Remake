@@ -124,10 +124,12 @@ export function loadLevel(levelId) {
 				case nameToId.portalhorizontal:
 				case nameToId.portalvertical:
 					const portalType = tileId === nameToId.portalhorizontal ? 'horizontal' : 'vertical';
-					if (!portals[portalType][x]) {
-						portals[portalType][x] = [];
+					const portalKey = tileId === nameToId.portalhorizontal ? y : x;
+					const portalValue = tileId === nameToId.portalhorizontal ? x : y;
+					if (!portals[portalType][portalKey]) {
+						portals[portalType][portalKey] = [portalValue];
 					} else {
-						portals[portalType][x].push(y);
+						portals[portalType][portalKey].push(portalValue);
 					}
 
 					break;
