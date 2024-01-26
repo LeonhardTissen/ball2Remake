@@ -435,6 +435,7 @@ export function tickLevel() {
 
 	let playerEntity = null;
 	for (const entity of entities) {
+		let tileX, tileY, tileX1, tileX2;
 		switch (entity.type) {
 			case 'player':
 				if (deathTimer > 0) {
@@ -498,14 +499,14 @@ export function tickLevel() {
 				if (entity.xvel > 3) {
 					const tileX = Math.floor((entity.x + dampeningLookAhead) / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
+					if (isSolid(tileX, tileY, true, false)) {
 						entity.x = Math.floor(entity.x / tileWidth) * tileWidth + 8;
 						entity.xvel = 0;
 					}
 				} else if (entity.xvel < -3) {
 					const tileX = Math.floor((entity.x - dampeningLookAhead) / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
+					if (isSolid(tileX, tileY, true, false)) {
 						entity.x = Math.floor(entity.x / tileWidth) * tileWidth + 2;
 						entity.xvel = 0;
 					}
@@ -515,7 +516,7 @@ export function tickLevel() {
 					// Collision detection for floor while falling
 					const tileX = Math.floor(entity.x / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
+					if (isSolid(tileX, tileY, true, false)) {
 						entity.y = Math.floor((entity.y) / tileWidth) * tileWidth - 2;
 	
 						// Lower jump if holding space
@@ -525,7 +526,7 @@ export function tickLevel() {
 					// Collision detection for ceiling while jumping
 					const tileX = Math.floor(entity.x / tileWidth);
 					const tileY = Math.floor((entity.y - 4) / tileWidth);
-					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
+					if (isSolid(tileX, tileY, true, false)) {
 						entity.y = Math.ceil((entity.y - 4) / tileWidth) * tileWidth + 2;
 						entity.yvel = 0;
 					}
@@ -535,13 +536,13 @@ export function tickLevel() {
 				if (entity.xvel > 0) {
 					const tileX = Math.floor((entity.x + 2) / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
+					if (isSolid(tileX, tileY, true, false)) {
 						entity.xvel = 0;
 					}
 				} else {
 					const tileX = Math.floor((entity.x - 2) / tileWidth);
 					const tileY = Math.floor(entity.y / tileWidth);
-					if (isSolid(level[tileY][tileX], true, false, tileX, tileY)) {
+					if (isSolid(tileX, tileY, true, false)) {
 						entity.xvel = 0;
 					}
 				}
@@ -549,6 +550,7 @@ export function tickLevel() {
 				// Collision detection for static tiles
 				const playerTileX = Math.floor(entity.x / tileWidth);
 				const playerTileY = Math.floor(entity.y / tileWidth);
+
 				switch (level[playerTileY][playerTileX]) {
 					case nameToId.air:
 						entity.portalFatigue = false;
@@ -746,7 +748,9 @@ export function tickLevel() {
 			case 'pinkmonster':
 				const horizontalSpeed = entitySpeed[entity.type];
 				entity.x += entity.left ? -horizontalSpeed : horizontalSpeed;
-				if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth)])) {
+				tileX = Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth);
+				tileY = Math.floor(entity.y / tileWidth);
+				if (isSolid(tileX, tileY)) {
 					entity.left = !entity.left;
 				}
 
@@ -754,22 +758,29 @@ export function tickLevel() {
 			case 'wave':
 				entity.x += entity.left ? -3 : 3;
 				entity.y = entity.originY + Math.sin(tick * 0.3) * tileWidth;
-				if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth)])) {
+				tileX = Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth);
+				tileY = Math.floor(entity.y / tileWidth);
+				if (isSolid(tileX, tileY)) {
 					entity.left = !entity.left;
 				}
 				break;
 			case 'rollingball':
 				// Check if ball can fall
+				tileX1 = Math.floor((entity.x + 4) / tileWidth);
+				tileX2 = Math.floor((entity.x - 4) / tileWidth);
+				tileY = Math.floor((entity.y + 5) / tileWidth);
 				if (
-					!isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor((entity.x + 4) / tileWidth)]) &&
-					!isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor((entity.x - 4) / tileWidth)])
+					!isSolid(tileX1, tileY) &&
+					!isSolid(tileX2, tileY)
 				) {
 					entity.y += 2;
 				} else {
 					entity.y = Math.floor((entity.y + 5) / tileWidth) * tileWidth - 5;
-					
 					entity.x += entity.left ? -2 : 2;
-					if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth)])) {
+
+					tileX = Math.floor((entity.x + (entity.left ? -5 : 5)) / tileWidth);
+					tileY = Math.floor(entity.y / tileWidth);
+					if (isSolid(tileX, tileY)) {
 						entity.left = !entity.left;
 					}
 				}
@@ -808,9 +819,9 @@ export function tickLevel() {
 				const verticalSpeed = entitySpeed[entity.type];
 				entity.y += entity.down ? -verticalSpeed : verticalSpeed;
 				entity.yTransferMomentum = (entity.down ? -1.5 : 1.5);
-				const tileX = Math.floor(entity.x / tileWidth);
-				const tileY = Math.floor((entity.y + (entity.down ? -5 : 5)) / tileWidth);
-				if (isSolid(level[tileY][tileX], false, false, tileX, tileY)) {
+				tileX = Math.floor(entity.x / tileWidth);
+				tileY = Math.floor((entity.y + (entity.down ? -5 : 5)) / tileWidth);
+				if (isSolid(tileX, tileY, false, false)) {
 					entity.down = !entity.down;
 				}
 
@@ -833,7 +844,9 @@ export function tickLevel() {
 
 				switch (entity.behaviour) {
 					case 'crushing':
-						if (isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+						tileX = Math.floor(entity.x / tileWidth);
+						tileY = Math.floor((entity.y + 5) / tileWidth);
+						if (isSolid(tileX, tileY)) {
 							entity.behaviour = 'raising';
 							entity.y = Math.floor((entity.y + 5) / tileWidth) * tileWidth - 5;
 						} else {
@@ -841,7 +854,9 @@ export function tickLevel() {
 						}
 						break;
 					case 'raising':
-						if (isSolid(level[Math.floor((entity.y - 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+						tileX = Math.floor(entity.x / tileWidth);
+						tileY = Math.floor((entity.y - 5) / tileWidth);
+						if (isSolid(tileX, tileY)) {
 							entity.behaviour = 'neutral';
 							entity.y = Math.ceil((entity.y - 5) / tileWidth) * tileWidth + 5;
 						} else {
@@ -866,23 +881,31 @@ export function tickLevel() {
 				entity.y += entity.down ? redMonsterSpeed : -redMonsterSpeed;
 				if (entity.down) {
 					// Floor collision
-					if (isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+					tileX = Math.floor(entity.x / tileWidth);
+					tileY = Math.floor((entity.y + 5) / tileWidth);
+					if (isSolid(tileX, tileY)) {
 						entity.down = false;
 					}
 				} else {
 					// Ceiling collision
-					if (isSolid(level[Math.floor((entity.y - 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+					tileX = Math.floor(entity.x / tileWidth);
+					tileY = Math.floor((entity.y - 5) / tileWidth);
+					if (isSolid(tileX, tileY)) {
 						entity.down = true;
 					}
 				}
 				if (entity.left) {
 					// Left wall collision
-					if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x - 5) / tileWidth)])) {
+					tileX = Math.floor((entity.x - 5) / tileWidth);
+					tileY = Math.floor(entity.y / tileWidth);
+					if (isSolid(tileX, tileY)) {
 						entity.left = false;
 					}
 				} else {
 					// Right wall collision
-					if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + 5) / tileWidth)])) {
+					tileX = Math.floor((entity.x + 5) / tileWidth);
+					tileY = Math.floor(entity.y / tileWidth);
+					if (isSolid(tileX, tileY)) {
 						entity.left = true;
 					}
 				}
@@ -895,28 +918,36 @@ export function tickLevel() {
 				switch (entity.direction) {
 					case 'up':
 						entity.y -= planeSpeed;
-						if (isSolid(level[Math.floor((entity.y - 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+						tileX = Math.floor(entity.x / tileWidth);
+						tileY = Math.floor((entity.y - 5) / tileWidth);
+						if (isSolid(tileX, tileY)) {
 							entity.direction = 'right';
 							entity.y = Math.ceil((entity.y - 5) / tileWidth) * tileWidth + 5;
 						}
 						break;
 					case 'right':
 						entity.x += planeSpeed;
-						if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x + 5) / tileWidth)])) {
+						tileX = Math.floor((entity.x + 5) / tileWidth);
+						tileY = Math.floor(entity.y / tileWidth);
+						if (isSolid(tileX, tileY)) {
 							entity.direction = 'down';
 							entity.x = Math.floor((entity.x + 5) / tileWidth) * tileWidth - 5;
 						}
 						break;
 					case 'down':
 						entity.y += planeSpeed;
-						if (isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+						tileX = Math.floor(entity.x / tileWidth);
+						tileY = Math.floor((entity.y + 5) / tileWidth);
+						if (isSolid(tileX, tileY)) {
 							entity.direction = 'left';
 							entity.y = Math.floor((entity.y + 5) / tileWidth) * tileWidth - 5;
 						}
 						break;
 					case 'left':
 						entity.x -= planeSpeed;
-						if (isSolid(level[Math.floor(entity.y / tileWidth)][Math.floor((entity.x - 5) / tileWidth)])) {
+						tileX = Math.floor((entity.x - 5) / tileWidth);
+						tileY = Math.floor(entity.y / tileWidth);
+						if (isSolid(tileX, tileY)) {
 							entity.direction = 'up';
 							entity.x = Math.ceil((entity.x - 5) / tileWidth) * tileWidth + 5;
 						}
@@ -942,7 +973,7 @@ export function tickLevel() {
 						let hitWall = false;
 						while (!hitWall) {
 							x++;
-							if (isSolid(level[y][x])) {
+							if (isSolid(x, y)) {
 								hitWall = true;
 								break;
 							}
@@ -973,7 +1004,7 @@ export function tickLevel() {
 				const bulletTileX = Math.floor(entity.x / tileWidth);
 				const bulletTileY = Math.floor(entity.y / tileWidth);
 				// Kill bullet if collide with solid tile
-				if (isSolid(level[bulletTileY][bulletTileX], true, true, bulletTileX, bulletTileY)) {
+				if (isSolid(bulletTileX, bulletTileY, true, true)) {
 					entities.splice(entities.indexOf(entity), 1);
 				}
 				// Kill enemy if collide
@@ -1076,13 +1107,15 @@ export function tickLevel() {
 				entity.y += entity.yVel;
 				if (entity.yVel > 0) {
 					// Floor collision
-					if (isSolid(level[Math.floor((entity.y + 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+					tileX = Math.floor(entity.x / tileWidth);
+					tileY = Math.floor((entity.y + 5) / tileWidth);
+					if (isSolid(tileX, tileY)) {
 						entity.y = Math.floor((entity.y + 5) / tileWidth) * tileWidth - 5;
 						entity.yVel = 0;
 					}
 				} else {
 					// Ceiling collision
-					if (isSolid(level[Math.floor((entity.y - 5) / tileWidth)][Math.floor(entity.x / tileWidth)])) {
+					if (isSolid(tileX, tileY)) {
 						entity.y = Math.ceil((entity.y - 5) / tileWidth) * tileWidth + 5;
 						entity.yVel = 0;
 					}

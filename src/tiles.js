@@ -101,7 +101,8 @@ export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
 	return acc;
 }, {});
 
-export function isSolid(tileId, playerCaused = false, bulletPower = false, tileX = null, tileY = null) {
+export function isSolid(tileX, tileY, playerCaused = false, bulletPower = false) {
+	const tileId = level[tileY][tileX];
 	if (playerCaused) {
 		if (tileId === nameToId.breakableblock1) {
 			level[tileY][tileX] = nameToId.air;
