@@ -94,6 +94,7 @@ export const tileIds = {
 	85: 'eye',
 	86: 'sensor',
 	87: 'jumper',
+	88: 'pipe',
 }
 
 export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
@@ -102,6 +103,9 @@ export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
 }, {});
 
 export function isSolid(tileX, tileY, playerCaused = false, bulletPower = false) {
+	if (tileX < 0 || tileY < 0 || tileX >= level[0].length || tileY >= level.length) {
+		return false;
+	}
 	const tileId = level[tileY][tileX];
 	if (playerCaused) {
 		if (tileId === nameToId.breakableblock1) {
@@ -222,6 +226,7 @@ export function isEntity(tileId) {
 		'eye',
 		'sensor',
 		'jumper',
+		'pipe',
 	].includes(tileIds[tileId]);
 }
 

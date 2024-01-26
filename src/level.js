@@ -279,6 +279,14 @@ export function loadLevel(levelId) {
 						yVel: 0,
 					});
 					break;
+				case nameToId.pipe:
+					entities.push({
+						type: spriteName,
+						x: x * tileWidth + tileWidth / 2,
+						y: y * tileWidth + tileWidth / 2,
+						dropTimer: 0,
+					});
+					break;
 			}
 
 			if (isEntity(testLevel[y][x])) {
@@ -788,6 +796,11 @@ export function tickLevel() {
 				}
 				const ballTileX = Math.floor(entity.x / tileWidth);
 				const ballTileY = Math.floor(entity.y / tileWidth);
+				// Delete ball if it falls off the map
+				if (!level[ballTileY]) {
+					entities.splice(entities.indexOf(entity), 1);
+					break;
+				}
 				switch (level[ballTileY][ballTileX]) {
 					case nameToId.air:
 						entity.portalFatigue = false;
@@ -1124,6 +1137,19 @@ export function tickLevel() {
 				}
 				if (entity.yVel === 0 && tick % 40 === 0) {
 					entity.yVel = -4.5;
+				}
+				break;
+			case 'pipe':
+				// Drop rolling ball every 2 seconds
+				entity.dropTimer++;
+				if (entity.dropTimer === 30) {
+					entity.dropTimer = 0;
+					entities.push({
+						type: 'rollingball',
+						x: entity.x,
+						y: entity.y,
+						left: true,
+					});
 				}
 				break;
 		}
