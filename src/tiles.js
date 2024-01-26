@@ -31,7 +31,7 @@ export const tileIds = {
 	21: 'greenbricks',
 	22: 'explodableblock',
 	23: 'explodableblockbomb',
-	24: 'breakableblock',
+	24: 'breakableblock1',
 	25: 'invisibleblock',
 	26: 'brownbricks',
 	27: 'yellowholeblock',
@@ -68,6 +68,8 @@ export const tileIds = {
 	58: 'mushroomblock',
 	59: 'waterblock',
 	60: 'purplechainblock',
+	61: 'breakableblock2',
+	62: 'breakableblock3',
 	64: 'player',
 	65: 'horizontalmovingplatform1',
 	66: 'elevator1',
@@ -101,12 +103,20 @@ export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
 
 export function isSolid(tileId, playerCaused = false, bulletPower = false, tileX = null, tileY = null) {
 	if (playerCaused) {
-		if (tileId === nameToId.breakableblock) {
+		if (tileId === nameToId.breakableblock1) {
 			level[tileY][tileX] = nameToId.air;
-			createExplosionParticles('breakableblock', tileX * tileWidth, tileY * tileWidth);
+			createExplosionParticles('breakableblock1', tileX * tileWidth, tileY * tileWidth);
 			sound.play('TI');
+			return true;
+		} else if (tileId === nameToId.breakableblock2) {
+			level[tileY][tileX] = nameToId.breakableblock1;
+			return true;
+		} else if (tileId === nameToId.breakableblock3) {
+			level[tileY][tileX] = nameToId.breakableblock2;
+			return true;
 		} else if (tileId === nameToId.invisibleblock) {
 			addInvisibleTile(tileX, tileY);
+			return true;
 		}
 	}
 	if (tileId === nameToId.temporaryblock) {
@@ -142,8 +152,6 @@ export function isSolid(tileId, playerCaused = false, bulletPower = false, tileX
 		'greenbricks',
 		'explodableblock',
 		'explodableblockbomb',
-		'breakableblock',
-		'invisibleblock',
 		'brownbricks',
 		'yellowholeblock',
 		'purplediamondblock',
