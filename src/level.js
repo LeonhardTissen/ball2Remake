@@ -14,6 +14,7 @@ import { addTextEntity, drawDigits } from "./text.js";
 import { advanceTick, resetTick, tick } from "./tick.js";
 import { entitySpeed, isEntity, isEntityAnimated, isEntityEnemy, isEntityPlatform, isSolid, nameToId, tileIds, tileRotations } from "./tiles.js";
 import { tileWidth } from "./tilewidth.js";
+import { create2DArray } from "./utils/array.js";
 
 export let level = null;
 export let entities = [];
@@ -60,6 +61,13 @@ const explodingBombNeighbours = [
 	[0, 1],
 	[1, 1],
 ];
+
+export function deleteLevel() {
+	currentLevel = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+	const emptyLevel = create2DArray(16, 16, nameToId.air);
+	levels[currentLevel] = emptyLevel;
+	loadLevel(currentLevel);
+}
 
 export function restartLevel() {
 	loadLevel(currentLevel);

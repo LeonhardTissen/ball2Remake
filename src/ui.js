@@ -1,16 +1,16 @@
 import { toggleUploadMenu } from "./api.js";
 import { drawSprite } from "./assets.js";
 import { toggleEditorMode, toggleTileMenu } from "./editor.js";
-import { restartLevel } from "./level.js";
+import { deleteLevel, restartLevel } from "./level.js";
 import { initLevelMenu, toggleLevelMenu } from "./levelmenu.js";
 
 const buttons = [
 	'editor', 'restart', 'levels', // Game
-	'play', 'tiles', 'upload' // Editor
+	'play', 'tiles', 'upload', 'trash' // Editor
 ];
 const uiElement = document.getElementById('ui');
 
-const editorButtons = ['tiles', 'upload', 'play'];
+const editorButtons = ['tiles', 'upload', 'play', 'trash'];
 
 export function initUI() {
 	for (const buttonName of buttons) {
@@ -44,6 +44,11 @@ export function initUI() {
 					break;
 				case 'upload':
 					toggleUploadMenu();
+					break;
+				case 'trash':
+					if (confirm('Are you sure you want to delete this level?')) {
+						deleteLevel();
+					}
 					break;
 			}
 		});
