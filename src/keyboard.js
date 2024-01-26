@@ -1,3 +1,5 @@
+import { uploadMenuOpen } from "./api.js";
+import { toggleEditorMode } from "./editor.js";
 import { restartLevel } from "./level.js";
 
 export const keysHeld = new Set();
@@ -6,8 +8,12 @@ export function initKeyboard() {
 	document.addEventListener('keydown', (e) => {
 		keysHeld.add(e.key);
 
+		if (uploadMenuOpen) return;
+
 		if (e.key === 'r') {
 			restartLevel();
+		} else if (e.key === 't') {
+			toggleEditorMode();
 		}
 	});
 
@@ -29,7 +35,7 @@ export function isGoingRight() {
 }
 
 export function isHoldingSpace() {
-	return isKeyDown(' ') || isKeyDown('ArrowDown') || isKeyDown('s');
+	return isKeyDown(' ') || isKeyDown('ArrowDown') || isKeyDown('s') || isKeyDown('w');
 }
 
 if ('ontouchstart' in document.documentElement) {

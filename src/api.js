@@ -7,8 +7,10 @@ const uploadButton = document.getElementById('upload-button');
 const levelNameField = document.getElementById('level-name');
 const levelAuthorField = document.getElementById('author');
 
+export let uploadMenuOpen = false;
 export function toggleUploadMenu() {
-	uploadMenu.classList.toggle('hidden');
+	uploadMenuOpen = !uploadMenuOpen;
+	uploadMenu.classList.toggle('hidden', !uploadMenuOpen);
 }
 
 uploadButton.addEventListener('click', () => {
