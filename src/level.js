@@ -1162,7 +1162,7 @@ export function tickLevel() {
 					entities.push({
 						type: 'rollingball',
 						x: entity.x,
-						y: entity.y,
+						y: entity.y + 5,
 						left: true,
 					});
 				}
