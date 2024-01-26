@@ -2,6 +2,7 @@ import { drawRotatedSprite, drawSprite } from "./assets.js";
 import { sound } from "./audio.js";
 import { ctx, cvs } from "./canvas.js";
 import { editorMode, editorCursor, renderEditor, showTileMenu, toggleTileMenu, setCurrentEditorTile } from "./editor.js";
+import { ticksPerSecond } from "./gamemanager.js";
 import { clearInvensibleTiles, isTileInvisible } from "./invisible.js";
 import { isGoingLeft, isGoingRight, isHoldingSpace } from "./keyboard.js";
 import { addKey, resetKeys } from "./keys.js";
@@ -393,6 +394,9 @@ function renderEntities() {
 	for (const entity of entities) {
 		switch (entity.type) {
 			case 'player':
+				if (ticksPerSecond === 60) {
+					ctx.filter = 'hue-rotate(80deg)';
+				}
 				if (deathTimer > 0) {
 					const deathAnimFrame = Math.floor(deathTimerLength - deathTimer);
 					if (deathAnimFrame <= 3 && deathAnimFrame >= 1) {
@@ -405,6 +409,7 @@ function renderEntities() {
 				} else {
 					drawSprite('player', entity.x - 2, entity.y - 2);
 				}
+				ctx.filter = 'none';
 				break;
 			case 'plane':
 			case 'plane2':

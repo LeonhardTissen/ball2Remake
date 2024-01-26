@@ -7,8 +7,7 @@ import './audio.js';
 import './mouse.js';
 import { initUI } from "./ui.js";
 import { getHighestLevel } from "./localstorage.js";
-
-const ticksPerSecond = 30;
+import { startGameLoop } from "./gamemanager.js";
 
 loadAssets().then(() => {
 	initKeyboard();
@@ -22,6 +21,6 @@ loadAssets().then(() => {
 		loadLevel(`level${levelToStart}`);
 	}
 
-	setInterval(tickLevel, 1000 / ticksPerSecond);
+	startGameLoop();
 });
 

@@ -1,11 +1,13 @@
 import { toggleUploadMenu } from "./api.js";
 import { drawSprite } from "./assets.js";
 import { toggleEditorMode, toggleTileMenu } from "./editor.js";
+import { toggleFastMode } from "./gamemanager.js";
 import { deleteLevel, restartLevel } from "./level.js";
 import { initLevelMenu, toggleLevelMenu } from "./levelmenu.js";
+import { getHighestLevel } from "./localstorage.js";
 
 const buttons = [
-	'editor', 'restart', 'levels', // Game
+	'editor', 'restart', 'levels', 'fast', // Game
 	'play', 'tiles', 'upload', 'trash' // Editor
 ];
 const uiElement = document.getElementById('ui');
@@ -48,6 +50,13 @@ export function initUI() {
 				case 'trash':
 					if (confirm('Are you sure you want to delete this level?')) {
 						deleteLevel();
+					}
+					break;
+				case 'fast':
+					if (getHighestLevel() >= 30) {
+						toggleFastMode();
+					} else {
+						alert('You need to beat all 30 levels to unlock this feature!');
 					}
 					break;
 			}
