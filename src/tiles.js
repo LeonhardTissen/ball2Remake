@@ -103,7 +103,7 @@ export const nameToId = Object.entries(tileIds).reduce((acc, [id, name]) => {
 }, {});
 
 export function isSolid(tileX, tileY, playerCaused = false, bulletPower = false) {
-	if (tileX < 0 || tileY < 0 || tileX >= level[0].length || tileY >= level.length) {
+	if (!level[tileY] || !level[tileY][tileX]) {
 		return false;
 	}
 	const tileId = level[tileY][tileX];
