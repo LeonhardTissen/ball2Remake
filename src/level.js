@@ -336,6 +336,7 @@ export function renderLevel(context, thumbnail = false, levelRender = level) {
 		return;
 	};
 
+	if (thumbnail) return;
 	renderEntities();
 	renderExplosionParticles();
 
